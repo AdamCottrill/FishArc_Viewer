@@ -38,7 +38,80 @@ async def get_projects():
     sql = sql + where + f" limit {limit} offset {offset};"
 
     rs = await run_query(sql)
+
+    for record in rs:
+        prj_nm = record["PRJ_NM"]
+        record["PRJ_NM"] = prj_nm.title()
+        prj_ldr = record["PRJ_LDR"]
+        record["PRJ_LDR"] = prj_ldr.title()
+
     return {"count": count.get("N"), "data": rs}
+
+
+@api.route("/api/project_detail/<prj_cd>")
+async def get_project_detail(prj_cd):
+    """"""
+
+    sql = f"""select distinct prj_cd, prj_nm, prj_date0, prj_date1, prj_ldr,
+    COMMENT0  from fn011 where prj_cd = '{prj_cd}';"""
+    fn011 = await run_query(sql, True)
+
+    sql = f"""select distinct prj_cd, spc, spc_nm, grp, grp_des, spcmrk,
+    sizsam, sizatt, sizint, biosam, agedec, fdsam from fn012 where
+    prj_cd = '{prj_cd}' order by spc, grp;"""
+    fn012 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, ssn, ssn_date0, ssn_date1, ssn_des
+    from fn022 where prj_cd = '{prj_cd}' order by prj_cd, ssn;"""
+    fn022 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, dtp, DTP_NM, DOW_LST
+    from fn023 where prj_cd = '{prj_cd}' order by prj_cd, dtp;"""
+    fn023 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, dtp, prd, prdtm0, PRDTM1, PRD_DUR, TIME_WT
+    from fn024 where prj_cd = '{prj_cd}' order by prj_cd, dtp, prd;"""
+    fn024 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, date, dtp1 from fn025
+    where prj_cd = '{prj_cd}' order by prj_cd, date;"""
+    fn025 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, space, space_des, SPACE_SIZ, SPACE_WT,
+    AREA_LST, AREA_CNT, AREA_WT from fn026 where prj_cd = '{prj_cd}'
+    order by prj_cd, space;"""
+
+    fn026 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, mode, mode_des, gr, grtp, gruse, orient,
+    atyunit, itvunit, chkflag from fn028 where prj_cd = '{prj_cd}'
+    order by prj_cd, mode;"""
+
+    fn028 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, gr, gr_des, effcnt, effdst from
+    fn013 where prj_cd ='{prj_cd}' order by prj_cd, gr;"""
+
+    fn013 = await run_query(sql)
+
+    sql = f"""select distinct prj_cd, gr, eff, eff_des, mesh, grlen, grht,
+    grwid, grcol, grmat, gryarn, grknot  from fn014 where
+    prj_cd='{prj_cd}' order by prj_cd, gr, eff;"""
+
+    fn014 = await run_query(sql)
+
+    return {
+        "fn011": fn011,
+        "fn012": fn012,
+        "fn013": fn013,
+        "fn014": fn014,
+        "fn022": fn022,
+        "fn023": fn023,
+        "fn024": fn024,
+        "fn025": fn025,
+        "fn026": fn026,
+        "fn028": fn028,
+    }
 
 
 @api.route("/api/<prj_cd>/fn011")
