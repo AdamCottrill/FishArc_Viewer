@@ -10,7 +10,9 @@ import Nav from "./components/Nav";
 
 import { ProjectList } from "./pages/ProjectList";
 import { ProjectDetail } from "./pages/ProjectDetail";
-
+import { FN121 } from "./pages/FN121";
+import { FN123 } from "./pages/FN123";
+import { FN125 } from "./pages/FN125";
 const queryClient = new QueryClient();
 
 function App() {
@@ -27,6 +29,10 @@ function App() {
                 path="project_detail/:prj_cd"
                 element={<ProjectDetail />}
               />
+              <Route path="samples/:prj_cd" element={<FN121 />} />
+              <Route path="catch_counts/:prj_cd" element={<FN123 />} />
+              <Route path="biosamples/:prj_cd" element={<FN125 />} />
+
               <Route
                 path="*"
                 element={

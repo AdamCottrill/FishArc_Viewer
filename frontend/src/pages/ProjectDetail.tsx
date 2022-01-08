@@ -1,12 +1,5 @@
 import { FC } from "react";
-import {
-  Divider,
-  Flex,
-  Spacer,
-  Heading,
-  Text,
-  Container,
-} from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
@@ -44,14 +37,33 @@ export const ProjectDetail: FC = () => {
     <div>
       {data && (
         <>
-          <FN011 project={data.fn011} />
-          <FN012 data={data.fn012} />
-          <FN022 data={data.fn022} />
-          <FN023 fn023={data.fn023} fn024={data.fn024} />
-          <FN025 data={data.fn025} />
-          <FN026 data={data.fn026} />
-          <FN028 data={data.fn028} />
-          <FN013 fn013={data.fn013} fn014={data.fn014} />
+          <Container maxW="container.xl">
+            <FN011 project={data.fn011} />
+            <FN012 data={data.fn012} />
+            <Box my={4} maxW="container.xl" borderWidth="1px" borderRadius="lg">
+              <FN022 data={data.fn022} />
+              <FN023 fn023={data.fn023} fn024={data.fn024} />
+              <FN025 data={data.fn025} />
+            </Box>
+
+            <Container
+              my={4}
+              maxW="container.xl"
+              borderWidth="1px"
+              borderRadius="lg"
+            >
+              <FN026 data={data.fn026} />
+            </Container>
+            <Container
+              my={4}
+              maxW="container.xl"
+              borderWidth="1px"
+              borderRadius="lg"
+            >
+              <FN028 data={data.fn028} />
+              <FN013 fn013={data.fn013} fn014={data.fn014} />
+            </Container>
+          </Container>
         </>
       )}
     </div>

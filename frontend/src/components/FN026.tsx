@@ -44,7 +44,7 @@ export const FN026 = ({ data }): FC => {
   );
 
   return (
-    <Container py={8} maxW="container.xl">
+    <Container py={2} maxW="container.xl">
       <Heading align="left" size="md" my={4}>
         Spaces (FN026)
       </Heading>

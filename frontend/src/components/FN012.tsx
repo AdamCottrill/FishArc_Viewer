@@ -1,5 +1,13 @@
 import { FC, useMemo } from "react";
-import { Container, Heading } from "@chakra-ui/react";
+import {
+  Accordion,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  AccordionItem,
+  Container,
+  Heading,
+} from "@chakra-ui/react";
 import SortableTable from "../components/SortableTable";
 
 export const FN012 = ({ data }): FC => {
@@ -53,14 +61,26 @@ export const FN012 = ({ data }): FC => {
 
   return (
     <Container py={8} maxW="container.xl">
-      <Heading align="left" size="md" my={4}>
-        Fish Sampling Protocols (FN012)
-      </Heading>
-      {data.length ? (
-        <SortableTable columns={columns} data={data} />
-      ) : (
-        <p>No Fish Sampling Details Provided </p>
-      )}
+      <Accordion allowToggle>
+        <AccordionItem>
+          <h2>
+            <AccordionButton>
+              <Heading align="left" size="md" my={4}>
+                Fish Sampling Protocols (FN012)
+              </Heading>
+
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            {data.length ? (
+              <SortableTable columns={columns} data={data} />
+            ) : (
+              <p>No Fish Sampling Details Provided </p>
+            )}
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
     </Container>
   );
 };

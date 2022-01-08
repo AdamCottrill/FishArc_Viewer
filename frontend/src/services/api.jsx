@@ -20,6 +20,15 @@ export const getProjects = (filters) =>
 export const getProjectDetail = (project_code) =>
   api.get(`/project_detail/${project_code}`).then((res) => res.data);
 
+export const getFN121 = (project_code) =>
+  api.get(`/${project_code}/fn121`).then((res) => res.data);
+
+export const getFN123 = (project_code) =>
+  api.get(`/${project_code}/fn123`).then((res) => res.data);
+
+export const getFN125 = (project_code) =>
+  api.get(`/${project_code}/fn125`).then((res) => res.data);
+
 export const getProjectSeasons = (project_code) =>
   api.get(`/${project_code}/fn022`).then((res) => res.data);
 

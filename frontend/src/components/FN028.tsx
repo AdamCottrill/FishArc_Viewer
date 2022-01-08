@@ -53,7 +53,7 @@ export const FN028 = ({ data }): FC => {
   );
 
   return (
-    <Container py={8} maxW="container.xl">
+    <Container py={2} maxW="container.xl">
       <Heading align="left" size="md" my={4}>
         Fishing Modes (FN028)
       </Heading>

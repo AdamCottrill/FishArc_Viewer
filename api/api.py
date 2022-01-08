@@ -48,6 +48,78 @@ async def get_projects():
     return {"count": count.get("N"), "data": rs}
 
 
+@api.route("/api/<prj_cd>/fn121")
+async def get_fn121(prj_cd):
+    """"""
+
+    PAGE_SIZE = 100
+    filters = request.args
+
+    offset = PAGE_SIZE * int(filters.get("page", 0))
+    limit = filters.get("page_size", PAGE_SIZE)
+
+    sql = f"""select distinct prj_cd, sam, EFFDT0, EFFDT1, DATE,  EFFTM0, EFFTM1,
+    EFFDUR, GRTP, GR, SITE, AREA, GRID, MODE, COMMENT1 from fn121 where
+    prj_cd='{prj_cd}'"""
+
+    sql = sql + f" order by prj_cd, sam limit {limit} offset {offset};"
+    rs = await run_query(sql)
+
+    count_sql = f"select count() as N from fn121 where prj_cd='{prj_cd}'"
+    count = await run_query((count_sql), True)
+
+    return {"count": count.get("N"), "data": rs}
+
+
+@api.route("/api/<prj_cd>/fn123")
+async def get_fn123(prj_cd):
+    """"""
+
+    PAGE_SIZE = 100
+    filters = request.args
+
+    offset = PAGE_SIZE * int(filters.get("page", 0))
+    limit = filters.get("page_size", PAGE_SIZE)
+
+    sql = f"""select distinct  sam, eff, grp, spc, catcnt, biocnt,
+    RLSCNT, HVSCNT,  mescnt, meswt, mrkcnt, comment3 from fn123
+    where prj_cd = '{prj_cd}'"""
+
+    sql = sql + f" order by sam, eff, grp, spc limit {limit} offset {offset};"
+    rs = await run_query(sql)
+
+    count_sql = f"select count() as N from fn123 where prj_cd='{prj_cd}'"
+    count = await run_query((count_sql), True)
+
+    return {"count": count.get("N"), "data": rs}
+
+
+@api.route("/api/<prj_cd>/fn125")
+async def get_fn125(prj_cd):
+    """"""
+
+    PAGE_SIZE = 200
+    filters = request.args
+
+    offset = PAGE_SIZE * int(filters.get("page", 0))
+    limit = filters.get("page_size", PAGE_SIZE)
+
+    sql = f"""select distinct prj_cd, sam, EFF, GRP, SPC, FISH, FLEN, TLEN, RWT,
+    SEX, GON, MAT, AGE, AGEST, TISSUE, TAGID, TAGDOC, TAGSTAT, COMMENT5 from fn125
+    where prj_cd='{prj_cd}'"""
+
+    sql = (
+        sql
+        + f" order by prj_cd, sam, eff, grp, spc, fish limit {limit} offset {offset};"
+    )
+    rs = await run_query(sql)
+
+    count_sql = f"select count() as N from fn125 where prj_cd='{prj_cd}'"
+    count = await run_query((count_sql), True)
+
+    return {"count": count.get("N"), "data": rs}
+
+
 @api.route("/api/project_detail/<prj_cd>")
 async def get_project_detail(prj_cd):
     """"""
