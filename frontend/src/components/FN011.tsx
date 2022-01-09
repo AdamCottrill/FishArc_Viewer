@@ -14,7 +14,7 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 
 export const FN011 = ({ project }): FC => (
-  <Container pb={4} borderWidth="1px" borderRadius="lg" maxW="container.xl">
+  <Container p={8} borderWidth="1px" borderRadius="lg" maxW="container.xl">
     <Heading py={6}>
       {project.PRJ_NM} ({project.PRJ_CD})
     </Heading>

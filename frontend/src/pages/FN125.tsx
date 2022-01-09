@@ -1,14 +1,20 @@
-import { FC, useMemo } from "react";
-import { Heading, Container, Link } from "@chakra-ui/react";
+import { FC, useMemo, useState } from "react";
+import { Heading, Container, Link, useDisclosure } from "@chakra-ui/react";
 
 import { useParams, Link as RouterLink } from "react-router-dom";
 import { useQuery } from "react-query";
 
 import SortableTable from "../components/SortableTable";
 import MySpinner from "../components/MySpinner";
+import { Fn125Sidebar } from "../components/FN125Sidebar";
+import TableControls from "../components/TableControls";
+import { FilterDrawer } from "./components/FilterDrawer";
 import { getFN125 } from "../services/api";
 
 export const FN125: FC = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [recordCount, setRecordCount] = useState(0);
+
   let { prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
