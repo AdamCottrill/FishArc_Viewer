@@ -47,7 +47,6 @@ function App() {
               </Routes>
             </BrowserRouter>
           </ChakraProvider>
-          <ReactQueryDevtools />
         </QueryClientProvider>
       </Provider>
     </div>

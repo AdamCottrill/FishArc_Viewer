@@ -1,3 +1,4 @@
+import { useState, useReducer } from "react";
 import { useQuery } from "react-query";
 import {
   Accordion,
@@ -7,74 +8,185 @@ import {
   AccordionIcon,
   Box,
   Input,
+  Drawer,
+  Button,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
 } from "@chakra-ui/react";
+
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { update, remove } from "../store/slices/FN011ListFilterSlice";
 
 import { getFN011Filters } from "../services/api";
 import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
-import { addFilter, popFilter } from "../utils";
+//import { addFilter, popFilter } from "../utils";
 
-export const FN011Sidebar = ({ values, setValues }): JSX.Element => {
+const reducer = (state, action) => {
+  let current, key, value;
+  switch (action.type) {
+    case "update":
+      return { ...state, ...action.payload };
+    case "add":
+      [key, value] = Object.entries(action.payload)[0];
+      current = { ...state }?.[key] || [];
+      current = [...new Set([...current, value])];
+      return { ...state, [key]: current };
+    case "pop":
+      [key, value] = Object.entries(action.payload)[0];
+
+      current = { ...state };
+
+      if (current[key]?.filter) {
+        current[key] = current[key].filter((val) => val !== value);
+      } else {
+        delete current[key];
+      }
+
+      return current;
+
+    default:
+      return state;
+  }
+};
+
+export const FN011Sidebar = ({ isOpen, onClose }): JSX.Element => {
   const { data, status } = useQuery("FN011Choices", getFN011Filters);
+
+  const filters = useAppSelector((state) => state.FN011List);
+  const appDispatch = useAppDispatch();
+
+  const [state, dispatch] = useReducer(reducer, { ...filters });
 
   const handleCheckBoxChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     const { value, name } = event.currentTarget;
-    const checked = values[name] || [];
+    const checked = state[name] || [];
     if (checked.includes(value)) {
-      popFilter(values, setValues, name, value);
+      dispatch({ type: "pop", payload: { [name]: value } });
     } else {
-      addFilter(values, setValues, name, value);
+      dispatch({ type: "add", payload: { [name]: value } });
     }
   };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setValues({
-      ...values,
-      [event.currentTarget.id]: event.currentTarget.value,
-    });
 
   const handleBlur = function (
     event: React.FocusEvent<HTMLInputElement>
   ): void {
-    const { id } = event.currentTarget;
-    const value = values[id];
-    //dispatch(update({ [id]: value }));
-    setValues({ ...values, [id]: value });
+    const { id, value } = event.currentTarget;
+    dispatch({ type: "update", payload: { [id]: value } });
   };
 
+  const applyClick = () => {
+    onClose();
+    appDispatch(update(state));
+  };
   return (
-    <div>
-      <Accordion allowMultiple>
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Project Code
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <Accordion allowToggle>
+    <Drawer size="sm" isOpen={isOpen} placement="left" onClose={onClose}>
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton />
+        <DrawerHeader>Refine By:</DrawerHeader>
+        <DrawerBody>
+          <div>
+            <Accordion allowMultiple>
               <AccordionItem>
                 <h2>
                   <AccordionButton>
                     <Box flex="1" textAlign="left">
-                      Fisheries Office
+                      Project Code
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  <p>Project code starts with:</p>
+                  <Accordion allowToggle>
+                    <AccordionItem>
+                      <h2>
+                        <AccordionButton>
+                          <Box flex="1" textAlign="left">
+                            Fisheries Office
+                          </Box>
+                          <AccordionIcon />
+                        </AccordionButton>
+                      </h2>
+                      <AccordionPanel pb={4}>
+                        <p>Project code starts with:</p>
+                        <FilterCheckBoxes
+                          name="fof"
+                          items={data?.fof}
+                          status={status}
+                          filters={state}
+                          handleChange={handleCheckBoxChange}
+                          showFilterInput={true}
+                        />
+                      </AccordionPanel>
+                    </AccordionItem>
+
+                    <AccordionItem>
+                      <h2>
+                        <AccordionButton>
+                          <Box flex="1" textAlign="left">
+                            PRJ_CD Suffix
+                          </Box>
+                          <AccordionIcon />
+                        </AccordionButton>
+                      </h2>
+                      <AccordionPanel pb={4}>
+                        <p>Project code ends with:</p>
+                        <FilterCheckBoxes
+                          name="prj_cd_suffix"
+                          items={data?.suffixes}
+                          status={status}
+                          filters={state}
+                          handleChange={handleCheckBoxChange}
+                          showFilterInput={true}
+                        />
+                      </AccordionPanel>
+                    </AccordionItem>
+
+                    <AccordionItem>
+                      <h2>
+                        <AccordionButton>
+                          <Box flex="1" textAlign="left">
+                            PRJ_CD contains...
+                          </Box>
+                          <AccordionIcon />
+                        </AccordionButton>
+                      </h2>
+                      <AccordionPanel pb={4}>
+                        <Input
+                          placeholder="PRJ_CD contains..."
+                          size="xs"
+                          id="prj_cd__like"
+                          onBlur={handleBlur}
+                          defaultValue={state?.prj_cd__like || ""}
+                        />
+                      </AccordionPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">
+                      Project Type
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
                   <FilterCheckBoxes
-                    name="fof"
-                    items={data?.fof}
+                    name="project_type"
+                    items={data?.project_types}
                     status={status}
-                    filters={values}
+                    filters={state}
                     handleChange={handleCheckBoxChange}
-                    showFilterInput={true}
                   />
                 </AccordionPanel>
               </AccordionItem>
@@ -83,20 +195,19 @@ export const FN011Sidebar = ({ values, setValues }): JSX.Element => {
                 <h2>
                   <AccordionButton>
                     <Box flex="1" textAlign="left">
-                      PRJ_CD Suffix
+                      PRJ_NM like...
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
-                  <p>Project code ends with:</p>
-                  <FilterCheckBoxes
-                    name="prj_cd_suffix"
-                    items={data?.suffixes}
-                    status={status}
-                    filters={values}
-                    handleChange={handleCheckBoxChange}
-                    showFilterInput={true}
+                  <p></p>
+                  <Input
+                    placeholder="PRJ_NM like..."
+                    size="xs"
+                    id="prj_nm__like"
+                    onBlur={handleBlur}
+                    defaultValue={state?.prj_nm__like || ""}
                   />
                 </AccordionPanel>
               </AccordionItem>
@@ -105,67 +216,54 @@ export const FN011Sidebar = ({ values, setValues }): JSX.Element => {
                 <h2>
                   <AccordionButton>
                     <Box flex="1" textAlign="left">
-                      PRJ_CD contains...
+                      PRJ_LDR like...
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
                   <Input
-                    placeholder="PRJ_CD contains..."
+                    placeholder="PRJ_LDR contains..."
                     size="xs"
-                    id="prj_cd__like"
-                    onChange={handleChange}
+                    id="prj_ldr__like"
                     onBlur={handleBlur}
-                    value={values?.prj_cd__like ? values.prj_cd__like : ""}
+                    defaultValue={state?.prj_ldr__like || ""}
+                  />
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">
+                      Years
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <FilterCheckBoxes
+                    name="years"
+                    items={data?.years}
+                    status={status}
+                    filters={state}
+                    handleChange={handleCheckBoxChange}
+                    showFilterInput={true}
                   />
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Project Type
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <FilterCheckBoxes
-              name="project_type"
-              items={data?.project_types}
-              status={status}
-              filters={values}
-              handleChange={handleCheckBoxChange}
-            />
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Years
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <FilterCheckBoxes
-              name="years"
-              items={data?.years}
-              status={status}
-              filters={values}
-              handleChange={handleCheckBoxChange}
-              showFilterInput={true}
-            />
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </div>
+          </div>
+        </DrawerBody>
+        <DrawerFooter>
+          <Button mr={3} onClick={applyClick}>
+            Apply
+          </Button>
+          <Button variant="outline" mr={3} onClick={onClose}>
+            Cancel
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 };

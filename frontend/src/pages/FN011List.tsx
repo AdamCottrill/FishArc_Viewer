@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { useQuery } from "react-query";
-import {
-  Link,
-  Heading,
-  Container,
-  useDisclosure,
-  SimpleGrid,
-} from "@chakra-ui/react";
+import { Link, Heading, Container, useDisclosure } from "@chakra-ui/react";
 
 import { getProjects } from "../services/api";
 
@@ -19,17 +13,11 @@ import SortableTable from "../components/SortableTable";
 
 import { FN011Sidebar } from "../components/FN011Sidebar";
 import { TableControls } from "../components/TableControls";
-import { FilterDrawer } from "../components/FilterDrawer";
+//import { FilterDrawer } from "../components/FilterDrawer";
 
 export function FN011List() {
   const filters = useAppSelector((state) => state.FN011List);
-  const dispatch = useAppDispatch();
-
-  const [values, setValues] = useState({ ...filters });
-
-  useEffect(() => {
-    setValues({ ...filters });
-  }, [filters]);
+  const appDispatch = useAppDispatch();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
@@ -41,12 +29,12 @@ export function FN011List() {
   const [pageCount, setPageCount] = useState(1);
 
   useEffect(() => {
-    dispatch(update({ page: currentPage }));
+    appDispatch(update({ page: currentPage }));
   }, [currentPage]);
 
   const filterButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     const { name, value } = e.currentTarget;
-    dispatch(remove({ [name]: value }));
+    appDispatch(remove({ [name]: value }));
   };
 
   const { data, error, isLoading, isFetching } = useQuery(
@@ -112,11 +100,6 @@ export function FN011List() {
     return <MySpinner message={spinnerMessage} />;
   }
 
-  const applyClick = () => {
-    dispatch(update(values));
-    onClose();
-  };
-
   const nobs = data.count ? data.count.toLocaleString() : 0;
 
   return (
@@ -135,9 +118,8 @@ export function FN011List() {
 
         {data && <SortableTable columns={columns} data={data.data} />}
       </Container>
-      <FilterDrawer isOpen={isOpen} onClose={onClose} applyClick={applyClick}>
-        <FN011Sidebar values={values} setValues={setValues} />
-      </FilterDrawer>
+
+      <FN011Sidebar isOpen={isOpen} onClose={onClose} />
     </div>
   );
 }

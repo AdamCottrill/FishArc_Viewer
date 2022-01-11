@@ -2,4 +2,5 @@
 *.pyc
 api/.flaskenv
 api/build/*
+api/db/*
 frontend/node_modules/*
