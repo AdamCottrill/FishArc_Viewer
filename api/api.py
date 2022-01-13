@@ -3,7 +3,7 @@
 # from flask import Flask, request,
 from quart import Quart, request, send_from_directory
 
-from utils import run_query
+from utils import build_sql_filter, run_query, get_substring_sql
 
 api = Quart(__name__, static_folder="build", static_url_path="/")
 api.config["JSON_SORT_KEYS"] = False
@@ -36,6 +36,14 @@ async def react_app():
 async def get_projects():
     """"""
 
+    # where to find the assocaited substring for each field
+    substring_map = {
+        "fof": [1, 3],
+        "project_type": [5, 2],
+        "years": [7, 2],
+        "prj_cd_suffix": [10, 3],
+    }
+
     PAGE_SIZE = 100
     filters = request.args
 
@@ -44,71 +52,14 @@ async def get_projects():
 
     sql = "select distinct prj_cd, prj_nm, prj_date0, prj_date1,prj_ldr from fn011"
 
-    fof = filters.get("fof")
-    if fof:
-        values = ", ".join([f"'{x}'" for x in fof.split(",")])
-        fof_filter = f" SUBSTR(prj_cd, 1,3) in ({values}) "
-    else:
-        fof_filter = ""
+    fields = ["prj_cd", "prj_ldr", "prj_nm"]
+    selectors = build_sql_filter(filters, fields)
+    substrings = get_substring_sql(filters, substring_map)
 
-    ptype = filters.get("project_type")
-    if ptype:
-        values = ", ".join([f"'{x}'" for x in ptype.split(",")])
-        ptype_filter = f" SUBSTR(prj_cd, 5,2) in ({values}) "
-    else:
-        ptype_filter = ""
-
-    years = filters.get("years")
-    if years:
-        values = ", ".join([f"'{x}'" for x in years.split(",")])
-        year_filter = f" SUBSTR(prj_cd, 7,2) in ({values}) "
-    else:
-        year_filter = ""
-
-    suffixes = filters.get("prj_cd_suffix")
-    if suffixes:
-        values = ", ".join([f"'{x}'" for x in suffixes.split(",")])
-        suffix_filter = f" SUBSTR(prj_cd, 10,3) in ({values}) "
-    else:
-        suffix_filter = ""
-
-    prj_cd_like = filters.get("prj_cd__like")
-    if prj_cd_like:
-        prj_cd_like_filter = f" upper(prj_cd) like '%{prj_cd_like.upper()}%' "
-    else:
-        prj_cd_like_filter = ""
-
-    prj_nm_like = filters.get("prj_nm__like")
-    if prj_nm_like:
-        prj_nm_like_filter = f" upper(prj_nm)  like '%{prj_nm_like.upper()}%' "
-    else:
-        prj_nm_like_filter = ""
-
-    prj_ldr_like = filters.get("prj_ldr__like")
-    if prj_ldr_like:
-        prj_ldr_like_filter = f" upper(prj_ldr) like '%{prj_ldr_like.upper()}%' "
-    else:
-        prj_ldr_like_filter = ""
-
-    filters = [
-        fof_filter,
-        ptype_filter,
-        year_filter,
-        suffix_filter,
-        prj_cd_like_filter,
-        prj_nm_like_filter,
-        prj_ldr_like_filter,
-    ]
-    filters = [x for x in filters if x != ""]
-
-    if len(filters):
-        where = " where " + " AND ".join(filters)
+    if len(selectors) or len(substrings):
+        where = " where " + selectors + substrings
     else:
         where = ""
-
-    # project_type__in => SUBSTR(prj_cd, 5,2) in [{values}]
-    # year__in => SUBSTR(prj_cd, 7,2) in [{values}]
-    # suffix__in => => SUBSTR(prj_cd, 10,3) in [{values}]
 
     count = await run_query(("select count() as N from fn011" + where), True)
 
@@ -249,39 +200,11 @@ async def get_fn125(prj_cd):
     SEX, GON, MAT, AGE, AGEST, TISSUE, TAGID, TAGDOC, TAGSTAT, COMMENT5 from fn125
     where prj_cd='{prj_cd}'"""
 
-    sams = filters.get("sam__in")
-    if sams:
-        values = ", ".join([f"'{x}'" for x in sams.split(",")])
-        sam_filter = f" SAM in ({values}) "
-    else:
-        sam_filter = ""
+    fields = ["sam", "spc", "eff", "grp"]
+    selectors = build_sql_filter(filters, fields)
 
-    grps = filters.get("grp__in")
-    if grps:
-        values = ", ".join([f"'{x}'" for x in grps.split(",")])
-        grp_filter = f" GRP in ({values}) "
-    else:
-        grp_filter = ""
-
-    effs = filters.get("eff__in")
-    if effs:
-        values = ", ".join([f"'{x}'" for x in effs.split(",")])
-        eff_filter = f" EFF in ({values}) "
-    else:
-        eff_filter = ""
-
-    spcs = filters.get("spc__in")
-    if spcs:
-        values = ", ".join([f"'{x}'" for x in spcs.split(",")])
-        spc_filter = f" SPC in ({values}) "
-    else:
-        spc_filter = ""
-
-    filters = [sam_filter, grp_filter, eff_filter, spc_filter]
-    filters = [x for x in filters if x != ""]
-
-    if filters:
-        where = " AND " + " AND ".join(filters)
+    if selectors:
+        where = " AND " + selectors
     else:
         where = ""
 

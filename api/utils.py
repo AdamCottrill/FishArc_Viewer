@@ -87,3 +87,17 @@ def build_sql_filter(url_filters, fields):
     )
 
     return sql
+
+
+def get_substring_sql(filters, mapping):
+
+    substring_filters = []
+
+    for key, val in filters.items():
+        if mapping.get(key):
+            # parse the values and wrap them in quotes, call them values
+            values = ", ".join([f"'{x}'" for x in val.split(",")])
+            x = mapping.get(key)
+            substr_sql = f" SUBSTR([PRJ_CD], {x[0]},{x[1]}) in ({values}) "
+            substring_filters.append(substr_sql)
+    return " AND ".join(substring_filters)
