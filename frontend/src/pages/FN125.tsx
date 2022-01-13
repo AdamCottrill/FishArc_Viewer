@@ -1,25 +1,46 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useMemo, useEffect, useState } from "react";
 import { Heading, Container, Link, useDisclosure } from "@chakra-ui/react";
 
 import { useParams, Link as RouterLink } from "react-router-dom";
 import { useQuery } from "react-query";
 
 import SortableTable from "../components/SortableTable";
-import MySpinner from "../components/MySpinner";
-import { Fn125Sidebar } from "../components/FN125Sidebar";
-import TableControls from "../components/TableControls";
-import { FilterDrawer } from "./components/FilterDrawer";
+import Spinner from "../components/MySpinner";
+import { FN125Sidebar } from "../components/FN125Sidebar";
+import { TableControls } from "../components/TableControls";
+//import { FilterDrawer } from "./components/FilterDrawer";
 import { getFN125 } from "../services/api";
+
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { update, remove } from "../store/slices/FN125ListFilterSlice";
 
 export const FN125: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
 
+  const filters = useAppSelector((state) => state.FN125List);
+  const appDispatch = useAppDispatch();
+
+  /* Pagination*/
+  const perPage = 100;
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
+
+  useEffect(() => {
+    appDispatch(update({ page: currentPage }));
+  }, [currentPage]);
+
+  const filterButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    const { name, value } = e.currentTarget;
+    appDispatch(remove({ [name]: value }));
+  };
+
   let { prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["fn125", prj_cd],
-    () => getFN125(prj_cd)
+    ["fn125", prj_cd, filters],
+    () => getFN125(prj_cd, filters)
   );
 
   const columns = useMemo(
@@ -114,14 +135,26 @@ export const FN125: FC = () => {
     []
   );
 
+  useEffect(() => {
+    if (data) {
+      setRecordCount(data.count);
+      setPageCount(Math.ceil(data.count / perPage));
+    } else {
+      setPageCount(1);
+      setRecordCount(0);
+    }
+  }, [data, perPage, recordCount, setRecordCount]);
+
   if (error) {
     return <div>Something went wrong</div>;
   }
 
   if (isLoading || isFetching) {
     const spinnerMessage = `Fetching Bio-Data`;
-    return <MySpinner message={spinnerMessage} />;
+    return <Spinner message={spinnerMessage} />;
   }
+
+  const nobs = data.count ? data.count.toLocaleString() : 0;
 
   return (
     <Container my={4} maxW="container.xl">
@@ -130,13 +163,24 @@ export const FN125: FC = () => {
         <Link color="teal.500" as={RouterLink} to={`/project_detail/${prj_cd}`}>
           {prj_cd}
         </Link>{" "}
-        (N={data.count})
+        (N={nobs})
       </Heading>
+      <TableControls
+        filters={filters}
+        pageCount={pageCount}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        filterButtonClick={filterButtonClick}
+        drawerOnOpen={onOpen}
+      />
+
       {data.data.length ? (
         <SortableTable columns={columns} data={data.data} />
       ) : (
         <p>It doesn't look like there any FN125 Records</p>
       )}
+
+      <FN125Sidebar isOpen={isOpen} onClose={onClose} />
     </Container>
   );
 };

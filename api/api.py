@@ -90,11 +90,15 @@ async def get_projects():
     else:
         prj_ldr_like_filter = ""
 
-
-
-    filters = [fof_filter, ptype_filter, year_filter, suffix_filter,
-               prj_cd_like_filter, prj_nm_like_filter, prj_ldr_like_filter,
-               ]
+    filters = [
+        fof_filter,
+        ptype_filter,
+        year_filter,
+        suffix_filter,
+        prj_cd_like_filter,
+        prj_nm_like_filter,
+        prj_ldr_like_filter,
+    ]
     filters = [x for x in filters if x != ""]
 
     if len(filters):
@@ -238,20 +242,58 @@ async def get_fn125(prj_cd):
     PAGE_SIZE = 200
     filters = request.args
 
-    offset = PAGE_SIZE * int(filters.get("page", 0))
+    offset = PAGE_SIZE * (int(filters.get("page", 0)) - 1)
     limit = filters.get("page_size", PAGE_SIZE)
 
     sql = f"""select distinct prj_cd, sam, EFF, GRP, SPC, FISH, FLEN, TLEN, RWT,
     SEX, GON, MAT, AGE, AGEST, TISSUE, TAGID, TAGDOC, TAGSTAT, COMMENT5 from fn125
     where prj_cd='{prj_cd}'"""
 
+    sams = filters.get("sam__in")
+    if sams:
+        values = ", ".join([f"'{x}'" for x in sams.split(",")])
+        sam_filter = f" SAM in ({values}) "
+    else:
+        sam_filter = ""
+
+    grps = filters.get("grp__in")
+    if grps:
+        values = ", ".join([f"'{x}'" for x in grps.split(",")])
+        grp_filter = f" GRP in ({values}) "
+    else:
+        grp_filter = ""
+
+    effs = filters.get("eff__in")
+    if effs:
+        values = ", ".join([f"'{x}'" for x in effs.split(",")])
+        eff_filter = f" EFF in ({values}) "
+    else:
+        eff_filter = ""
+
+    spcs = filters.get("spc__in")
+    if spcs:
+        values = ", ".join([f"'{x}'" for x in spcs.split(",")])
+        spc_filter = f" SPC in ({values}) "
+    else:
+        spc_filter = ""
+
+    filters = [sam_filter, grp_filter, eff_filter, spc_filter]
+    filters = [x for x in filters if x != ""]
+
+    if filters:
+        where = " AND " + " AND ".join(filters)
+    else:
+        where = ""
+
     sql = (
         sql
+        + where
         + f" order by prj_cd, sam, eff, grp, spc, fish limit {limit} offset {offset};"
     )
+
     rs = await run_query(sql)
 
-    count_sql = f"select count() as N from fn125 where prj_cd='{prj_cd}'"
+    count_sql = f"select count() as N from fn125 where prj_cd='{prj_cd}'" + where
     count = await run_query((count_sql), True)
 
     return {"count": count.get("N"), "data": rs}

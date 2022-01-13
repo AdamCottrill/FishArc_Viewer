@@ -19,39 +19,12 @@ import {
 } from "@chakra-ui/react";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { update, remove } from "../store/slices/FN011ListFilterSlice";
+import { update } from "../store/slices/FN011ListFilterSlice";
 
 import { getFN011Filters } from "../services/api";
 import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
 //import { addFilter, popFilter } from "../utils";
-
-const reducer = (state, action) => {
-  let current, key, value;
-  switch (action.type) {
-    case "update":
-      return { ...state, ...action.payload };
-    case "add":
-      [key, value] = Object.entries(action.payload)[0];
-      current = { ...state }?.[key] || [];
-      current = [...new Set([...current, value])];
-      return { ...state, [key]: current };
-    case "pop":
-      [key, value] = Object.entries(action.payload)[0];
-
-      current = { ...state };
-
-      if (current[key]?.filter) {
-        current[key] = current[key].filter((val) => val !== value);
-      } else {
-        delete current[key];
-      }
-
-      return current;
-
-    default:
-      return state;
-  }
-};
+import reducer from "./SideBarReducer";
 
 export const FN011Sidebar = ({ isOpen, onClose }): JSX.Element => {
   const { data, status } = useQuery("FN011Choices", getFN011Filters);
@@ -84,6 +57,7 @@ export const FN011Sidebar = ({ isOpen, onClose }): JSX.Element => {
     onClose();
     appDispatch(update(state));
   };
+
   return (
     <Drawer size="sm" isOpen={isOpen} placement="left" onClose={onClose}>
       <DrawerOverlay />
