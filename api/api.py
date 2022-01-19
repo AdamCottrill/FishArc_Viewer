@@ -9,7 +9,8 @@ from utils import (
     get_sam_eff_spc_grps,
     run_query,
     get_substring_sql,
-    get_fn123_125_where,
+    get_strata_filter_sql,
+    get_where_sql,
 )
 
 api = Quart(__name__, static_folder="build", static_url_path="/")
@@ -108,17 +109,21 @@ async def get_fn121(prj_cd):
     PAGE_SIZE = 100
     filters = request.args
 
-    offset = PAGE_SIZE * int(filters.get("page", 0))
+    offset = PAGE_SIZE * (int(filters.get("page", 0)) - 1)
     limit = filters.get("page_size", PAGE_SIZE)
 
-    sql = f"""select distinct prj_cd, sam, EFFDT0, EFFDT1, DATE,  EFFTM0, EFFTM1,
+    sql = f"""select distinct prj_cd, sam, stratum, EFFDT0, EFFDT1, DATE,  EFFTM0, EFFTM1,
     EFFDUR, GRTP, GR, SITE, AREA, GRID, MODE, COMMENT1 from fn121 where
     prj_cd='{prj_cd}'"""
 
-    sql = sql + f" order by prj_cd, sam limit {limit} offset {offset};"
+    where_fields = ["stratum", "sam", "spc", "eff", "grp"]
+    where = get_where_sql(filters, where_fields)
+
+    sql = sql + where + f" order by prj_cd, sam limit {limit} offset {offset};"
+
     rs = await run_query(sql)
 
-    count_sql = f"select count() as N from fn121 where prj_cd='{prj_cd}'"
+    count_sql = f"select count() as N from fn121 where prj_cd='{prj_cd}'" + where
     count = await run_query((count_sql), True)
 
     return {"count": count.get("N"), "data": rs}
@@ -131,14 +136,15 @@ async def get_fn123(prj_cd):
     PAGE_SIZE = 100
     filters = request.args
 
-    offset = PAGE_SIZE * int(filters.get("page", 0))
+    offset = PAGE_SIZE * (int(filters.get("page", 0)) - 1)
     limit = filters.get("page_size", PAGE_SIZE)
 
-    sql = f"""select distinct  sam, eff, grp, spc, catcnt, biocnt,
+    sql = f"""select distinct  sam, stratum, eff, grp, spc, catcnt, biocnt,
     RLSCNT, HVSCNT,  mescnt, meswt, mrkcnt, comment3 from fn123
     where prj_cd = '{prj_cd}'"""
 
-    where = get_fn123_125_where(filters)
+    where_fields = ["stratum", "sam", "spc", "eff", "grp"]
+    where = get_where_sql(filters, where_fields)
 
     sql = sql + where + f" order by sam, eff, grp, spc limit {limit} offset {offset};"
 
@@ -164,7 +170,8 @@ async def get_fn125(prj_cd):
     SEX, GON, MAT, AGE, AGEST, TISSUE, TAGID, TAGDOC, TAGSTAT, COMMENT5 from fn125
     where prj_cd='{prj_cd}'"""
 
-    where = get_fn123_125_where(filters)
+    where_fields = ["stratum", "sam", "spc", "eff", "grp"]
+    where = get_where_sql(filters, where_fields)
 
     sql = (
         sql

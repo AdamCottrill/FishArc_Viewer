@@ -86,10 +86,10 @@ export const FN123Sidebar = ({ isOpen, onClose }): JSX.Element => {
                         </AccordionButton>
                       </h2>
                       <AccordionPanel pb={4}>
-                        {data?.stratum.length ? (
+                        {data?.stratum__in.length ? (
                           <FilterCheckBoxes
-                            name="stratum"
-                            items={data?.stratum}
+                            name="stratum__in"
+                            items={data?.stratum__in}
                             status={status}
                             filters={state}
                             handleChange={handleCheckBoxChange}

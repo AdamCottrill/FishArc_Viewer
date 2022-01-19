@@ -1,5 +1,5 @@
 import os
-
+from typing import List
 from databases import Database
 
 # DB_DIR = "/home/adam/Documents/sandbox/"
@@ -100,12 +100,16 @@ def get_substring_sql(filters: dict, field: str, mapping: dict) -> str:
             x = mapping.get(key)
             substr_sql = f" SUBSTR([{field}], {x[0]},{x[1]}) in ({values}) "
             substring_filters.append(substr_sql)
+
     return " AND ".join(substring_filters)
 
 
-def get_fn123_125_where(filters: dict) -> str:
-    fields = ["sam", "spc", "eff", "grp"]
-    selectors = build_sql_filter(filters, fields)
+def get_strata_filter_sql(filters: dict) -> str:
+    """if the filters contain any keys that correspond to strata
+    components, build the sql string that will select for matching
+    records.
+
+    """
 
     # parse attributes out of stratum
     substring_map = {
@@ -113,7 +117,15 @@ def get_fn123_125_where(filters: dict) -> str:
         "space": [7, 2],
         "mode": [10, 2],
     }
-    substrings = get_substring_sql(filters, "STRATUM", substring_map)
+
+    return get_substring_sql(filters, "STRATUM", substring_map)
+
+
+def get_where_sql(filters: dict, fields: List[str]) -> str:
+
+    selectors = build_sql_filter(filters, fields)
+
+    substrings = get_strata_filter_sql(filters)
 
     where = ""
 

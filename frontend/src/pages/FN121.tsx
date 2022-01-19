@@ -1,19 +1,46 @@
-import { FC, useMemo } from "react";
-import { Heading, Link, Container } from "@chakra-ui/react";
+import { FC, useMemo, useEffect, useState } from "react";
+import { Heading, Container, Link, useDisclosure } from "@chakra-ui/react";
 
 import { useParams, Link as RouterLink } from "react-router-dom";
 import { useQuery } from "react-query";
 
-import MySpinner from "../components/MySpinner";
 import SortableTable from "../components/SortableTable";
-import { getFN121 } from "../services/api";
+import Spinner from "../components/MySpinner";
+import { FN121Sidebar } from "../components/FN121Sidebar";
+import { TableControls } from "../components/TableControls";
+//import { FilterDrawer } from "./components/FilterDrawer";
+import { get_fn_data } from "../services/api";
+
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { update, remove } from "../store/slices/FN121ListFilterSlice";
 
 export const FN121: FC = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [recordCount, setRecordCount] = useState(0);
+
+  const filters = useAppSelector((state) => state.FN121List);
+  const appDispatch = useAppDispatch();
+
+  /* Pagination*/
+  const perPage = 100;
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
+
+  useEffect(() => {
+    appDispatch(update({ page: currentPage }));
+  }, [currentPage]);
+
+  const filterButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    const { name, value } = e.currentTarget;
+    appDispatch(remove({ [name]: value }));
+  };
+
   let { prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["fn121", prj_cd],
-    () => getFN121(prj_cd)
+    ["fn121", prj_cd, filters],
+    () => get_fn_data(prj_cd, "fn121", filters)
   );
 
   const columns = useMemo(
@@ -21,6 +48,10 @@ export const FN121: FC = () => {
       {
         Header: "SAM",
         accessor: "SAM",
+      },
+      {
+        Header: "STRATUM",
+        accessor: "STRATUM",
       },
       {
         Header: "EFFDT0",
@@ -88,14 +119,26 @@ export const FN121: FC = () => {
     []
   );
 
+  useEffect(() => {
+    if (data) {
+      setRecordCount(data.count);
+      setPageCount(Math.ceil(data.count / perPage));
+    } else {
+      setPageCount(1);
+      setRecordCount(0);
+    }
+  }, [data, perPage, recordCount, setRecordCount]);
+
   if (error) {
     return <div>Something went wrong</div>;
   }
 
   if (isLoading || isFetching) {
     const spinnerMessage = `Fetching Samples`;
-    return <MySpinner message={spinnerMessage} />;
+    return <Spinner message={spinnerMessage} />;
   }
+
+  const nobs = data.count ? data.count.toLocaleString() : 0;
 
   return (
     <Container my={4} maxW="container.xl">
@@ -104,13 +147,24 @@ export const FN121: FC = () => {
         <Link color="teal.500" as={RouterLink} to={`/project_detail/${prj_cd}`}>
           {prj_cd}
         </Link>{" "}
-        (N={data.count})
+        (N={nobs})
       </Heading>
-      {data.data.length ? (
+
+      <TableControls
+        filters={filters}
+        pageCount={pageCount}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        filterButtonClick={filterButtonClick}
+        drawerOnOpen={onOpen}
+      />
+
+      {data.data ? (
         <SortableTable columns={columns} data={data.data} />
       ) : (
         <p>It doesn't look like there any FN121 Records</p>
       )}
+      <FN121Sidebar isOpen={isOpen} onClose={onClose} />
     </Container>
   );
 };

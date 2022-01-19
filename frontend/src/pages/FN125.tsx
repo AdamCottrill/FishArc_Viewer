@@ -9,7 +9,7 @@ import Spinner from "../components/MySpinner";
 import { FN125Sidebar } from "../components/FN125Sidebar";
 import { TableControls } from "../components/TableControls";
 //import { FilterDrawer } from "./components/FilterDrawer";
-import { getFN125 } from "../services/api";
+import { get_fn_data } from "../services/api";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { update, remove } from "../store/slices/FN125ListFilterSlice";
@@ -40,7 +40,7 @@ export const FN125: FC = () => {
 
   const { data, error, isLoading, isFetching } = useQuery(
     ["fn125", prj_cd, filters],
-    () => getFN125(prj_cd, filters)
+    () => get_fn_data(prj_cd, "fn125", filters)
   );
 
   const columns = useMemo(

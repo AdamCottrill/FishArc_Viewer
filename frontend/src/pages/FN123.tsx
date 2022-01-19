@@ -9,7 +9,7 @@ import Spinner from "../components/MySpinner";
 import { FN123Sidebar } from "../components/FN123Sidebar";
 import { TableControls } from "../components/TableControls";
 //import { FilterDrawer } from "./components/FilterDrawer";
-import { getFN123 } from "../services/api";
+import { get_fn_data } from "../services/api";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { update, remove } from "../store/slices/FN123ListFilterSlice";
@@ -18,7 +18,7 @@ export const FN123: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
 
-  const filters = useAppSelector((state) => state.FN125List);
+  const filters = useAppSelector((state) => state.FN123List);
   const appDispatch = useAppDispatch();
 
   /* Pagination*/
@@ -39,8 +39,8 @@ export const FN123: FC = () => {
   let { prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["fn123", prj_cd],
-    () => getFN123(prj_cd)
+    ["fn123", prj_cd, filters],
+    () => get_fn_data(prj_cd, "fn123", filters)
   );
 
   const columns = useMemo(
@@ -48,6 +48,10 @@ export const FN123: FC = () => {
       {
         Header: "SAM",
         accessor: "SAM",
+      },
+      {
+        Header: "STRATUM",
+        accessor: "STRATUM",
       },
       {
         Header: "EFF",
