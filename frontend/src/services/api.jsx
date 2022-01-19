@@ -317,11 +317,37 @@ export const getProjectDetail = (project_code) =>
 export const getFN121 = (project_code) =>
   api.get(`/${project_code}/fn121/`).then((res) => res.data);
 
+export const getFN121Filters = (project_code) =>
+  api.get(`/${project_code}/fn121/choices/`).then((res) => {
+    const { stratum, fn022, fn026, fn028 } = res.data;
+
+    const stratum0 = stratum.map((x) => ({
+      value: x.STRATUM,
+      label: x.STRATUM,
+    }));
+
+    const ssn = fn022.map((x) => ({
+      value: x.SSN,
+      label: `${x.SSN_DES} (${x.SSN})`,
+    }));
+    const space = fn026.map((x) => ({
+      value: x.SPACE,
+      label: `${x.SPACE_DES} (${x.SPACE})`,
+    }));
+
+    const mode = fn028.map((x) => ({
+      value: x.MODE,
+      label: `${x.MODE_DES} (${x.MODE})`,
+    }));
+
+    return { stratum: stratum0, ssn, space, mode };
+  });
+
 export const getFN123 = (project_code) =>
   api.get(`/${project_code}/fn123/`).then((res) => res.data);
 
 export const getFN123Filters = (project_code) =>
-  api.get(`/${project_code}/fn123_filters/`).then((res) => {
+  api.get(`/${project_code}/fn123/choices/`).then((res) => {
     const { sams, effs, species, grps, stratum, fn022, fn026, fn028 } =
       res.data;
 
@@ -365,7 +391,7 @@ export const getFN125 = (project_code, filters) =>
     .then((res) => res.data);
 
 export const getFN125Filters = (project_code) =>
-  api.get(`/${project_code}/fn125_filters/`).then((res) => {
+  api.get(`/${project_code}/fn125/choices/`).then((res) => {
     const { sams, effs, species, grps, stratum, fn022, fn026, fn028 } =
       res.data;
 

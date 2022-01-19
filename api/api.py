@@ -3,7 +3,14 @@
 # from flask import Flask, request,
 from quart import Quart, request, send_from_directory
 
-from utils import build_sql_filter, run_query, get_substring_sql, get_fn123_125_where
+from utils import (
+    build_sql_filter,
+    get_project_strata,
+    get_sam_eff_spc_grps,
+    run_query,
+    get_substring_sql,
+    get_fn123_125_where,
+)
 
 api = Quart(__name__, static_folder="build", static_url_path="/")
 api.config["JSON_SORT_KEYS"] = False
@@ -18,7 +25,6 @@ async def react_app():
 @api.route("/api/projects/")
 async def get_projects():
     """"""
-
 
     PAGE_SIZE = 100
     filters = request.args
@@ -44,8 +50,8 @@ async def get_projects():
         where = " where "
     else:
         where = ""
-    conjugate = ' AND ' if len(selectors) and len(substrings) else ''
-    where =  where + substrings + conjugate + selectors
+    conjugate = " AND " if len(selectors) and len(substrings) else ""
+    where = where + substrings + conjugate + selectors
     sql = sql + where + f" limit {limit} offset {offset};"
 
     rs = await run_query(sql)
@@ -118,70 +124,6 @@ async def get_fn121(prj_cd):
     return {"count": count.get("N"), "data": rs}
 
 
-@api.route("/api/<prj_cd>/fn123_filters/")
-async def get_fn123_filters(prj_cd):
-    """sam, eff, spc, grp"""
-
-    sql = f"select distinct sam as value from fn123 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    sams = [x["value"] for x in rs]
-    sams.sort()
-
-    sql = f"select distinct eff as value from fn123 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    effs = [x["value"] for x in rs]
-    effs.sort()
-
-    sql = f"select distinct grp as value from fn123 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    grps = [x["value"] for x in rs]
-    grps.sort()
-
-    sql = f"select distinct spc as value from fn123 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    species = [x["value"] for x in rs]
-    species.sort()
-
-    sql = f"""select distinct stratum
-    from fn125 where prj_cd = '{prj_cd}' order by stratum;"""
-    stratum = await run_query(sql)
-
-    sql = f"""select distinct ssn, ssn_des
-    from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
-    fn022 = await run_query(sql)
-
-    sql = f"""select distinct dtp, DTP_NM
-    from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
-    fn023 = await run_query(sql)
-
-    sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
-    from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
-    fn024 = await run_query(sql)
-
-    sql = f"""select distinct space, space_des from
-    fn026 where prj_cd = '{prj_cd}' order by space;"""
-
-    fn026 = await run_query(sql)
-
-    sql = f"""select distinct mode, mode_des from fn028 where
-    prj_cd = '{prj_cd}' order by mode;"""
-
-    fn028 = await run_query(sql)
-
-    return {
-        "sams": sams,
-        "effs": effs,
-        "grps": grps,
-        "species": species,
-        "stratum": stratum,
-        "fn022": fn022,
-        "fn023": fn023,
-        "fn024": fn024,
-        "fn026": fn026,
-        "fn028": fn028,
-    }
-
-
 @api.route("/api/<prj_cd>/fn123/")
 async def get_fn123(prj_cd):
     """"""
@@ -198,9 +140,7 @@ async def get_fn123(prj_cd):
 
     where = get_fn123_125_where(filters)
 
-    sql = (sql
-           + where
-           + f" order by sam, eff, grp, spc limit {limit} offset {offset};")
+    sql = sql + where + f" order by sam, eff, grp, spc limit {limit} offset {offset};"
 
     rs = await run_query(sql)
 
@@ -208,8 +148,6 @@ async def get_fn123(prj_cd):
     count = await run_query((count_sql), True)
 
     return {"count": count.get("N"), "data": rs}
-
-
 
 
 @api.route("/api/<prj_cd>/fn125/")
@@ -242,68 +180,20 @@ async def get_fn125(prj_cd):
     return {"count": count.get("N"), "data": rs}
 
 
-@api.route("/api/<prj_cd>/fn125_filters/")
-async def get_fn125_filters(prj_cd):
-    """sam, eff, spc, grp"""
+@api.route("/api/<prj_cd>/<table>/choices/")
+async def get_table_choices(prj_cd, table):
+    """Get the distinct strata values, samples, efforts. groups, and
+    species in a project so they can be used to filter the table."""
 
-    sql = f"select distinct sam as value from fn125 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    sams = [x["value"] for x in rs]
-    sams.sort()
+    if table == "fn121":
+        choices = {}
+    else:
+        choices = await get_sam_eff_spc_grps(prj_cd, table)
+    strata = await get_project_strata(prj_cd, table)
 
-    sql = f"select distinct eff as value from fn125 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    effs = [x["value"] for x in rs]
-    effs.sort()
+    choices.update(strata)
 
-    sql = f"select distinct grp as value from fn125 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    grps = [x["value"] for x in rs]
-    grps.sort()
-
-    sql = f"select distinct spc as value from fn125 where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
-    species = [x["value"] for x in rs]
-    species.sort()
-
-    sql = f"""select distinct stratum
-    from fn125 where prj_cd = '{prj_cd}' order by stratum;"""
-    stratum = await run_query(sql)
-
-    sql = f"""select distinct ssn, ssn_des
-    from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
-    fn022 = await run_query(sql)
-
-    sql = f"""select distinct dtp, DTP_NM
-    from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
-    fn023 = await run_query(sql)
-
-    sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
-    from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
-    fn024 = await run_query(sql)
-
-    sql = f"""select distinct space, space_des from
-    fn026 where prj_cd = '{prj_cd}' order by space;"""
-
-    fn026 = await run_query(sql)
-
-    sql = f"""select distinct mode, mode_des from fn028 where
-    prj_cd = '{prj_cd}' order by mode;"""
-
-    fn028 = await run_query(sql)
-
-    return {
-        "sams": sams,
-        "effs": effs,
-        "grps": grps,
-        "species": species,
-        "stratum": stratum,
-        "fn022": fn022,
-        "fn023": fn023,
-        "fn024": fn024,
-        "fn026": fn026,
-        "fn028": fn028,
-    }
+    return choices
 
 
 @api.route("/api/project_detail/<prj_cd>/")
@@ -370,112 +260,6 @@ async def get_project_detail(prj_cd):
         "fn026": fn026,
         "fn028": fn028,
     }
-
-
-# @api.route("/api/<prj_cd>/fn011/")
-# async def get_fn011(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, prj_nm, prj_date0, prj_date1, prj_ldr,
-#     COMMENT0  from fn011 where prj_cd = '{prj_cd}';"""
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn022/")
-# async def get_fn022(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, ssn, ssn_date0, ssn_date1, ssn_des
-#     from fn022 where prj_cd = '{prj_cd}' order by prj_cd, ssn;"""
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn023/")
-# async def get_fn023(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, dtp, DTP_NM, DOW_LST
-#     from fn023 where prj_cd = '{prj_cd}' order by prj_cd, dtp;"""
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn024/")
-# async def get_fn024(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, dtp, prd, prdtm0, PRDTM1, PRD_DUR, TIME_WT
-#     from fn024 where prj_cd = '{prj_cd}' order by prj_cd, dtp, prd;"""
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn025/")
-# async def get_fn025(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, date, dtp1 from fn025
-#     where prj_cd = '{prj_cd}' order by prj_cd, date;"""
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn026/")
-# async def get_fn026(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, space, space_des, SPACE_SIZ, SPACE_WT,
-#     AREA_LST, AREA_CNT, AREA_WT from fn026 where prj_cd = '{prj_cd}'
-#     order by prj_cd, space;"""
-
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn028/")
-# async def get_fn028(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, mode, mode_des, gr, grtp, gruse, orient,
-#     atyunit, itvunit, chkflag from fn028 where prj_cd = '{prj_cd}'
-#     order by prj_cd, mode;"""
-
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn013/")
-# async def get_fn013(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, gr, gr_des, effcnt, effdst from
-#     fn013 where prj_cd ='{prj_cd}' order by prj_cd, gr;"""
-
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
-
-
-# @api.route("/api/<prj_cd>/fn014/")
-# async def get_fn014(prj_cd):
-#     """"""
-
-#     sql = f"""select distinct prj_cd, gr, eff, eff_des, mesh, grlen, grht,
-#     grwid, grcol, grmat, gryarn, grknot  from fn014 where
-#     prj_cd='{prj_cd}' order by prj_cd, gr, eff;"""
-
-#     rs = await run_query(sql)
-
-#     return {"data": rs}
 
 
 api.run()
