@@ -88,8 +88,7 @@ def build_sql_filter(url_filters, fields):
 
     return sql
 
-
-def get_substring_sql(filters, mapping):
+def get_substring_sql(filters:dict, field:str, mapping:dict) -> str:
 
     substring_filters = []
 
@@ -98,6 +97,28 @@ def get_substring_sql(filters, mapping):
             # parse the values and wrap them in quotes, call them values
             values = ", ".join([f"'{x}'" for x in val.split(",")])
             x = mapping.get(key)
-            substr_sql = f" SUBSTR([PRJ_CD], {x[0]},{x[1]}) in ({values}) "
+            substr_sql = f" SUBSTR([{field}], {x[0]},{x[1]}) in ({values}) "
             substring_filters.append(substr_sql)
     return " AND ".join(substring_filters)
+
+
+
+def get_fn123_125_where(filters:dict)->str:
+    fields = ["sam", "spc", "eff", "grp"]
+    selectors = build_sql_filter(filters, fields)
+
+    #parse attributes out of stratum
+    substring_map = {
+        "ssn": [1,2],
+        "space": [7, 2],
+        "mode": [10, 2],
+    }
+    substrings = get_substring_sql(filters, "STRATUM", substring_map)
+
+    where = ""
+
+    if len(selectors):
+        where = where + " AND " + selectors
+    if len(substrings):
+        where = where + " AND " + substrings
+    return where

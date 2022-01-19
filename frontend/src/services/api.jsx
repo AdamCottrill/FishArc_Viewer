@@ -321,7 +321,39 @@ export const getFN123 = (project_code) =>
   api.get(`/${project_code}/fn123/`).then((res) => res.data);
 
 export const getFN123Filters = (project_code) =>
-  api.get(`/${project_code}/fn123_filters/`).then((res) => res.data);
+  api.get(`/${project_code}/fn123_filters/`).then((res) => {
+    const { sams, effs, species, grps, stratum, fn022, fn026, fn028 } =
+      res.data;
+
+    const sam = sams.map((x) => ({ value: x, label: x }));
+    const eff = effs.map((x) => ({ value: x, label: x }));
+    const grp = grps.map((x) => ({ value: x, label: x }));
+    const spc = species.map((x) => ({
+      value: x,
+      label: spc_names[x] ? `${spc_names[x]} (${x})` : `${x}`,
+    }));
+
+    const stratum0 = stratum.map((x) => ({
+      value: x.STRATUM,
+      label: x.STRATUM,
+    }));
+
+    const ssn = fn022.map((x) => ({
+      value: x.SSN,
+      label: `${x.SSN_DES} (${x.SSN})`,
+    }));
+    const space = fn026.map((x) => ({
+      value: x.SPACE,
+      label: `${x.SPACE_DES} (${x.SPACE})`,
+    }));
+
+    const mode = fn028.map((x) => ({
+      value: x.MODE,
+      label: `${x.MODE_DES} (${x.MODE})`,
+    }));
+
+    return { sam, eff, spc, grp, stratum: stratum0, ssn, space, mode };
+  });
 
 export const getFN125 = (project_code, filters) =>
   api
@@ -334,7 +366,8 @@ export const getFN125 = (project_code, filters) =>
 
 export const getFN125Filters = (project_code) =>
   api.get(`/${project_code}/fn125_filters/`).then((res) => {
-    const { sams, effs, species, grps } = res.data;
+    const { sams, effs, species, grps, stratum, fn022, fn026, fn028 } =
+      res.data;
 
     const sam = sams.map((x) => ({ value: x, label: x }));
     const eff = effs.map((x) => ({ value: x, label: x }));
@@ -344,7 +377,26 @@ export const getFN125Filters = (project_code) =>
       label: spc_names[x] ? `${spc_names[x]} (${x})` : `${x}`,
     }));
 
-    return { sam, eff, spc, grp };
+    const stratum0 = stratum.map((x) => ({
+      value: x.STRATUM,
+      label: x.STRATUM,
+    }));
+
+    const ssn = fn022.map((x) => ({
+      value: x.SSN,
+      label: `${x.SSN_DES} (${x.SSN})`,
+    }));
+    const space = fn026.map((x) => ({
+      value: x.SPACE,
+      label: `${x.SPACE_DES} (${x.SPACE})`,
+    }));
+
+    const mode = fn028.map((x) => ({
+      value: x.MODE,
+      label: `${x.MODE_DES} (${x.MODE})`,
+    }));
+
+    return { sam, eff, spc, grp, stratum: stratum0, ssn, space, mode };
   });
 
 //export const getProjectSeasons = (project_code) =>

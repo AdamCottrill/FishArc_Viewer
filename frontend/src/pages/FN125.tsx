@@ -50,6 +50,10 @@ export const FN125: FC = () => {
         accessor: "SAM",
       },
       {
+        Header: "STRATUM",
+        accessor: "STRATUM",
+      },
+      {
         Header: "EFF",
         accessor: "EFF",
       },
@@ -165,6 +169,7 @@ export const FN125: FC = () => {
         </Link>{" "}
         (N={nobs})
       </Heading>
+
       <TableControls
         filters={filters}
         pageCount={pageCount}

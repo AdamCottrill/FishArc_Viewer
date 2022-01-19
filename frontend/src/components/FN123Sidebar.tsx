@@ -19,22 +19,22 @@ import {
 } from "@chakra-ui/react";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { update } from "../store/slices/FN125ListFilterSlice";
+import { update } from "../store/slices/FN123ListFilterSlice";
 
-import { getFN125Filters } from "../services/api";
+import { getFN123Filters } from "../services/api";
 import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
 
 //import { addFilter, popFilter } from "../utils";
 import reducer from "./SideBarReducer";
 
-export const FN125Sidebar = ({ isOpen, onClose }): JSX.Element => {
+export const FN123Sidebar = ({ isOpen, onClose }): JSX.Element => {
   let { prj_cd } = useParams();
 
-  const { data, status } = useQuery(["FN125Choices", prj_cd], () =>
-    getFN125Filters(prj_cd)
+  const { data, status } = useQuery(["FN123Choices", prj_cd], () =>
+    getFN123Filters(prj_cd)
   );
 
-  const filters = useAppSelector((state) => state.FN125List);
+  const filters = useAppSelector((state) => state.FN123List);
   const appDispatch = useAppDispatch();
 
   const [state, dispatch] = useReducer(reducer, { ...filters });

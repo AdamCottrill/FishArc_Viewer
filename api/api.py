@@ -3,27 +3,10 @@
 # from flask import Flask, request,
 from quart import Quart, request, send_from_directory
 
-from utils import build_sql_filter, run_query, get_substring_sql
+from utils import build_sql_filter, run_query, get_substring_sql, get_fn123_125_where
 
 api = Quart(__name__, static_folder="build", static_url_path="/")
 api.config["JSON_SORT_KEYS"] = False
-
-
-# "CREATE INDEX FN011_prj_cd ON FN011 (prj_cd);"
-# "CREATE INDEX FN011_prj_cd_fof ON FN011(SUBSTR(prj_cd, 1, 3));"
-# "CREATE INDEX FN011_prj_cd_project_type ON FN011(SUBSTR(prj_cd, 5, 2));"
-# "CREATE INDEX FN011_prj_cd_year ON FN011(SUBSTR(prj_cd, 7, 2));"
-# "CREATE INDEX FN011_prj_cd_suffix ON FN011(SUBSTR(prj_cd, 10, 3));"
-#
-# "CREATE INDEX FN123_prj_cd ON FN123 (prj_cd);"
-# "CREATE INDEX FN123_sam ON FN123 (prj_cd, sam);"
-# "CREATE INDEX FN123_grp ON FN123 (prj_cd, grp);"
-# "CREATE INDEX FN123_spc ON FN123 (prj_cd, spc);"
-#
-# "CREATE INDEX FN125_prj_cd ON FN125 (prj_cd);"
-# "CREATE INDEX FN125_sam ON FN125 (prj_cd, sam);"
-# "CREATE INDEX FN125_grp ON FN125 (prj_cd, grp);"
-# "CREATE INDEX FN125_spc ON FN125 (prj_cd, spc);"
 
 
 @api.route("/")
@@ -36,13 +19,6 @@ async def react_app():
 async def get_projects():
     """"""
 
-    # where to find the assocaited substring for each field
-    substring_map = {
-        "fof": [1, 3],
-        "project_type": [5, 2],
-        "years": [7, 2],
-        "prj_cd_suffix": [10, 3],
-    }
 
     PAGE_SIZE = 100
     filters = request.args
@@ -54,26 +30,32 @@ async def get_projects():
 
     fields = ["prj_cd", "prj_ldr", "prj_nm"]
     selectors = build_sql_filter(filters, fields)
-    substrings = get_substring_sql(filters, substring_map)
+
+    # where to find the assocaited substring for each field
+    substring_map = {
+        "fof": [1, 3],
+        "project_type": [5, 2],
+        "years": [7, 2],
+        "prj_cd_suffix": [10, 3],
+    }
+    substrings = get_substring_sql(filters, "PRJ_CD", substring_map)
 
     if len(selectors) or len(substrings):
-        where = " where " + selectors + substrings
+        where = " where "
     else:
         where = ""
-
-    count = await run_query(("select count() as N from fn011" + where), True)
-
+    conjugate = ' AND ' if len(selectors) and len(substrings) else ''
+    where =  where + substrings + conjugate + selectors
     sql = sql + where + f" limit {limit} offset {offset};"
 
-    print(sql)
-
     rs = await run_query(sql)
-
     for record in rs:
         prj_nm = record["PRJ_NM"]
         record["PRJ_NM"] = prj_nm.title()
         prj_ldr = record["PRJ_LDR"]
         record["PRJ_LDR"] = prj_ldr.title()
+
+    count = await run_query(("select count() as N from fn011" + where), True)
 
     return {"count": count.get("N"), "data": rs}
 
@@ -160,7 +142,44 @@ async def get_fn123_filters(prj_cd):
     species = [x["value"] for x in rs]
     species.sort()
 
-    return {"sams": sams, "effs": effs, "grps": grps, "species": species}
+    sql = f"""select distinct stratum
+    from fn125 where prj_cd = '{prj_cd}' order by stratum;"""
+    stratum = await run_query(sql)
+
+    sql = f"""select distinct ssn, ssn_des
+    from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
+    fn022 = await run_query(sql)
+
+    sql = f"""select distinct dtp, DTP_NM
+    from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
+    fn023 = await run_query(sql)
+
+    sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
+    from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
+    fn024 = await run_query(sql)
+
+    sql = f"""select distinct space, space_des from
+    fn026 where prj_cd = '{prj_cd}' order by space;"""
+
+    fn026 = await run_query(sql)
+
+    sql = f"""select distinct mode, mode_des from fn028 where
+    prj_cd = '{prj_cd}' order by mode;"""
+
+    fn028 = await run_query(sql)
+
+    return {
+        "sams": sams,
+        "effs": effs,
+        "grps": grps,
+        "species": species,
+        "stratum": stratum,
+        "fn022": fn022,
+        "fn023": fn023,
+        "fn024": fn024,
+        "fn026": fn026,
+        "fn028": fn028,
+    }
 
 
 @api.route("/api/<prj_cd>/fn123/")
@@ -177,13 +196,20 @@ async def get_fn123(prj_cd):
     RLSCNT, HVSCNT,  mescnt, meswt, mrkcnt, comment3 from fn123
     where prj_cd = '{prj_cd}'"""
 
-    sql = sql + f" order by sam, eff, grp, spc limit {limit} offset {offset};"
+    where = get_fn123_125_where(filters)
+
+    sql = (sql
+           + where
+           + f" order by sam, eff, grp, spc limit {limit} offset {offset};")
+
     rs = await run_query(sql)
 
-    count_sql = f"select count() as N from fn123 where prj_cd='{prj_cd}'"
+    count_sql = f"select count() as N from fn123 where prj_cd='{prj_cd}'" + where
     count = await run_query((count_sql), True)
 
     return {"count": count.get("N"), "data": rs}
+
+
 
 
 @api.route("/api/<prj_cd>/fn125/")
@@ -196,17 +222,11 @@ async def get_fn125(prj_cd):
     offset = PAGE_SIZE * (int(filters.get("page", 0)) - 1)
     limit = filters.get("page_size", PAGE_SIZE)
 
-    sql = f"""select distinct prj_cd, sam, EFF, GRP, SPC, FISH, FLEN, TLEN, RWT,
+    sql = f"""select distinct prj_cd, Stratum, sam, EFF, GRP, SPC, FISH, FLEN, TLEN, RWT,
     SEX, GON, MAT, AGE, AGEST, TISSUE, TAGID, TAGDOC, TAGSTAT, COMMENT5 from fn125
     where prj_cd='{prj_cd}'"""
 
-    fields = ["sam", "spc", "eff", "grp"]
-    selectors = build_sql_filter(filters, fields)
-
-    if selectors:
-        where = " AND " + selectors
-    else:
-        where = ""
+    where = get_fn123_125_where(filters)
 
     sql = (
         sql
@@ -246,7 +266,44 @@ async def get_fn125_filters(prj_cd):
     species = [x["value"] for x in rs]
     species.sort()
 
-    return {"sams": sams, "effs": effs, "grps": grps, "species": species}
+    sql = f"""select distinct stratum
+    from fn125 where prj_cd = '{prj_cd}' order by stratum;"""
+    stratum = await run_query(sql)
+
+    sql = f"""select distinct ssn, ssn_des
+    from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
+    fn022 = await run_query(sql)
+
+    sql = f"""select distinct dtp, DTP_NM
+    from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
+    fn023 = await run_query(sql)
+
+    sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
+    from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
+    fn024 = await run_query(sql)
+
+    sql = f"""select distinct space, space_des from
+    fn026 where prj_cd = '{prj_cd}' order by space;"""
+
+    fn026 = await run_query(sql)
+
+    sql = f"""select distinct mode, mode_des from fn028 where
+    prj_cd = '{prj_cd}' order by mode;"""
+
+    fn028 = await run_query(sql)
+
+    return {
+        "sams": sams,
+        "effs": effs,
+        "grps": grps,
+        "species": species,
+        "stratum": stratum,
+        "fn022": fn022,
+        "fn023": fn023,
+        "fn024": fn024,
+        "fn026": fn026,
+        "fn028": fn028,
+    }
 
 
 @api.route("/api/project_detail/<prj_cd>/")
