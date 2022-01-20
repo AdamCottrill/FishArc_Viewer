@@ -11,15 +11,29 @@ import { TableControls } from "../components/TableControls";
 //import { FilterDrawer } from "./components/FilterDrawer";
 import { get_fn_data } from "../services/api";
 
-import { useAppSelector, useAppDispatch } from "../store/hooks";
+import {
+  useAppSelector,
+  useAppDispatch,
+  useCustomSearchParams,
+} from "../store/hooks";
 import { update, remove } from "../store/slices/FN121ListFilterSlice";
 
 export const FN121: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
+  let [searchAsObject, setSearch] = useCustomSearchParams();
 
   const filters = useAppSelector((state) => state.FN121List);
   const appDispatch = useAppDispatch();
+
+  useEffect(() => {
+    appDispatch(update(searchAsObject));
+  }, []);
+
+  // update the url query search parameters each time the filters change
+  useEffect(() => {
+    setSearch(filters);
+  }, [filters]);
 
   /* Pagination*/
   const perPage = 100;

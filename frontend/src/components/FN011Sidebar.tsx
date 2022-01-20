@@ -113,7 +113,7 @@ export const FN011Sidebar = ({ isOpen, onClose }): JSX.Element => {
                         <p>Project code ends with:</p>
                         <FilterCheckBoxes
                           name="prj_cd_suffix"
-                          items={data?.suffixes}
+                          items={data?.prj_cd_suffix}
                           status={status}
                           filters={state}
                           handleChange={handleCheckBoxChange}
@@ -157,7 +157,7 @@ export const FN011Sidebar = ({ isOpen, onClose }): JSX.Element => {
                 <AccordionPanel pb={4}>
                   <FilterCheckBoxes
                     name="project_type"
-                    items={data?.project_types}
+                    items={data?.project_type}
                     status={status}
                     filters={state}
                     handleChange={handleCheckBoxChange}

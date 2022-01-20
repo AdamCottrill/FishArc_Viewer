@@ -94,7 +94,8 @@ def get_substring_sql(filters: dict, field: str, mapping: dict) -> str:
     substring_filters = []
 
     for key, val in filters.items():
-        if mapping.get(key):
+        # if mapping.get(key):
+        if key in mapping:
             # parse the values and wrap them in quotes, call them values
             values = ", ".join([f"'{x}'" for x in val.split(",")])
             x = mapping.get(key)

@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { Link, Heading, Container, useDisclosure } from "@chakra-ui/react";
 
 import { getProjects } from "../services/api";
 
-import { useAppSelector, useAppDispatch } from "../store/hooks";
+import {
+  useAppSelector,
+  useAppDispatch,
+  useCustomSearchParams,
+} from "../store/hooks";
 import { update, remove } from "../store/slices/FN011ListFilterSlice";
 
 import MySpinner from "../components/MySpinner";
@@ -16,11 +20,21 @@ import { TableControls } from "../components/TableControls";
 //import { FilterDrawer } from "../components/FilterDrawer";
 
 export function FN011List() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [recordCount, setRecordCount] = useState(0);
+  let [searchAsObject, setSearch] = useCustomSearchParams();
+
   const filters = useAppSelector((state) => state.FN011List);
   const appDispatch = useAppDispatch();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [recordCount, setRecordCount] = useState(0);
+  useEffect(() => {
+    appDispatch(update(searchAsObject));
+  }, []);
+
+  // update the url query search parameters each time the filters change
+  useEffect(() => {
+    setSearch(filters);
+  }, [filters]);
 
   /* Pagination*/
   const perPage = 100;
@@ -31,6 +45,8 @@ export function FN011List() {
   useEffect(() => {
     appDispatch(update({ page: currentPage }));
   }, [currentPage]);
+
+  console.log(searchAsObject);
 
   const filterButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     const { name, value } = e.currentTarget;

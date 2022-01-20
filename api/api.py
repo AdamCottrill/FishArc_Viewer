@@ -64,7 +64,7 @@ async def get_projects():
 
     count = await run_query(("select count() as N from fn011" + where), True)
 
-    return {"count": count.get("N"), "data": rs}
+    return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/project_filters/")
@@ -126,7 +126,7 @@ async def get_fn121(prj_cd):
     count_sql = f"select count() as N from fn121 where prj_cd='{prj_cd}'" + where
     count = await run_query((count_sql), True)
 
-    return {"count": count.get("N"), "data": rs}
+    return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<prj_cd>/fn123/")
@@ -153,7 +153,7 @@ async def get_fn123(prj_cd):
     count_sql = f"select count() as N from fn123 where prj_cd='{prj_cd}'" + where
     count = await run_query((count_sql), True)
 
-    return {"count": count.get("N"), "data": rs}
+    return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<prj_cd>/fn125/")
@@ -184,7 +184,7 @@ async def get_fn125(prj_cd):
     count_sql = f"select count() as N from fn125 where prj_cd='{prj_cd}'" + where
     count = await run_query((count_sql), True)
 
-    return {"count": count.get("N"), "data": rs}
+    return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<prj_cd>/<table>/choices/")

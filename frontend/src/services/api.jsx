@@ -305,8 +305,8 @@ export const getFN011Filters = () =>
 
     return {
       fof: _fof,
-      project_types: _project_types,
-      suffixes: _suffixes,
+      project_type: _project_types,
+      prj_cd_suffix: _suffixes,
       years: _years,
     };
   });
