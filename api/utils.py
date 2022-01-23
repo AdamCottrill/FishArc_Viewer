@@ -5,15 +5,22 @@ from databases import Database
 # DB_DIR = "/home/adam/Documents/sandbox/"
 DB_DIR = "./db"
 
+DB_SOURCES = {
+    "fisharc":"fisharc.db",
+    "glarc":"GrandGrandWazoo.db"
+}
 
-async def run_query(sql, fetchone=False):
+
+
+async def run_query(source, sql, fetchone=False):
     """
 
     Arguments:
     - `sql`:
     """
 
-    fndb = os.path.join(DB_DIR, "fisharc.db")
+    src = source if source in DB_SOURCES else 'fisharc'
+    fndb = os.path.join(DB_DIR, DB_SOURCES.get(src))
 
     database = Database(f"sqlite:///{fndb}")
     data = {}
@@ -137,25 +144,25 @@ def get_where_sql(filters: dict, fields: List[str]) -> str:
     return where
 
 
-async def get_sam_eff_spc_grps(prj_cd, table):
+async def get_sam_eff_spc_grps(source, prj_cd, table):
 
     sql = f"select distinct sam as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
+    rs = await run_query(source, sql)
     sams = [x["value"] for x in rs]
     sams.sort()
 
     sql = f"select distinct eff as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
+    rs = await run_query(source, sql)
     effs = [x["value"] for x in rs]
     effs.sort()
 
     sql = f"select distinct grp as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
+    rs = await run_query(source, sql)
     grps = [x["value"] for x in rs]
     grps.sort()
 
     sql = f"select distinct spc as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(sql)
+    rs = await run_query(source, sql)
     species = [x["value"] for x in rs]
     species.sort()
 
@@ -167,35 +174,35 @@ async def get_sam_eff_spc_grps(prj_cd, table):
     }
 
 
-async def get_project_strata(prj_cd, table):
+async def get_project_strata(source, prj_cd, table):
     """return a dictionary containing the distinct strata from each design
     table for teh given project."""
 
     sql = f"""select distinct stratum
     from {table} where prj_cd = '{prj_cd}' order by stratum;"""
-    stratum = await run_query(sql)
+    stratum = await run_query(source, sql)
 
     sql = f"""select distinct ssn, ssn_des
     from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
-    fn022 = await run_query(sql)
+    fn022 = await run_query(source, sql)
 
     sql = f"""select distinct dtp, DTP_NM
     from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
-    fn023 = await run_query(sql)
+    fn023 = await run_query(source, sql)
 
     sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
     from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
-    fn024 = await run_query(sql)
+    fn024 = await run_query(source, sql)
 
     sql = f"""select distinct space, space_des from
     fn026 where prj_cd = '{prj_cd}' order by space;"""
 
-    fn026 = await run_query(sql)
+    fn026 = await run_query(source, sql)
 
     sql = f"""select distinct mode, mode_des from fn028 where
     prj_cd = '{prj_cd}' order by mode;"""
 
-    fn028 = await run_query(sql)
+    fn028 = await run_query(source, sql)
 
     return {
         "stratum": stratum,
