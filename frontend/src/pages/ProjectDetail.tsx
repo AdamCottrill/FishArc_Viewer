@@ -17,11 +17,11 @@ import { FN028 } from "../components/FN028";
 import { FN013 } from "../components/FN013";
 
 export const ProjectDetail: FC = () => {
-  let { prj_cd } = useParams();
+  let { source, prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["project_detail", prj_cd],
-    () => getProjectDetail(prj_cd)
+    ["project_detail", source, prj_cd],
+    () => getProjectDetail(source, prj_cd)
   );
 
   if (error) {
@@ -38,7 +38,7 @@ export const ProjectDetail: FC = () => {
       {data && (
         <>
           <Container maxW="container.xl">
-            <FN011 project={data.fn011} />
+            <FN011 source={source} project={data.fn011} />
             <FN012 data={data.fn012} />
             <Box my={4} maxW="container.xl" borderWidth="1px" borderRadius="lg">
               <FN022 data={data.fn022} />

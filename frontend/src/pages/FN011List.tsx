@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link as RouterLink, useSearchParams } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { Link, Heading, Container, useDisclosure } from "@chakra-ui/react";
 
@@ -14,6 +14,7 @@ import { update, remove } from "../store/slices/FN011ListFilterSlice";
 
 import MySpinner from "../components/MySpinner";
 import SortableTable from "../components/SortableTable";
+import DataSourceRadioButtons from "../components/DataSourceRadios";
 
 import { FN011Sidebar } from "../components/FN011Sidebar";
 import { TableControls } from "../components/TableControls";
@@ -23,6 +24,8 @@ export function FN011List() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
   let [searchAsObject, setSearch] = useCustomSearchParams();
+
+  let { source } = useParams();
 
   const filters = useAppSelector((state) => state.FN011List);
   const appDispatch = useAppDispatch();
@@ -46,16 +49,14 @@ export function FN011List() {
     appDispatch(update({ page: currentPage }));
   }, [currentPage]);
 
-  console.log(searchAsObject);
-
   const filterButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     const { name, value } = e.currentTarget;
     appDispatch(remove({ [name]: value }));
   };
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["projects", filters],
-    () => getProjects(filters)
+    ["projects", source, filters],
+    () => getProjects(source, filters)
   );
 
   const columns = useMemo(
@@ -70,7 +71,7 @@ export function FN011List() {
             <Link
               as={RouterLink}
               color="blue"
-              to={{ pathname: `/project_detail/${PRJ_CD}` }}
+              to={{ pathname: `/${source}/project_detail/${PRJ_CD}` }}
             >
               {PRJ_CD}
             </Link>
@@ -121,7 +122,11 @@ export function FN011List() {
   return (
     <div>
       <Container maxW="container.xl">
-        <Heading size="xl">Project List (N={nobs})</Heading>
+        <Heading size="xl">
+          {source === "glarc" ? "Great Lakes" : "Fishnet"} Archive (N={nobs})
+        </Heading>
+
+        <DataSourceRadioButtons />
 
         <TableControls
           filters={filters}

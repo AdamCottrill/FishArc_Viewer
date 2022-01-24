@@ -20,6 +20,7 @@ import {
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { update } from "../store/slices/FN011ListFilterSlice";
+import { useParams } from "react-router-dom";
 
 import { getFN011Filters } from "../services/api";
 import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
@@ -27,7 +28,11 @@ import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
 import reducer from "./SideBarReducer";
 
 export const FN011Sidebar = ({ isOpen, onClose }): JSX.Element => {
-  const { data, status } = useQuery("FN011Choices", getFN011Filters);
+  const { source } = useParams();
+
+  const { data, status } = useQuery(["FN011Choices", source], () =>
+    getFN011Filters(source)
+  );
 
   const filters = useAppSelector((state) => state.FN011List);
   const appDispatch = useAppDispatch();

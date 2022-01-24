@@ -28,10 +28,10 @@ import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
 import reducer from "./SideBarReducer";
 
 export const FN125Sidebar = ({ isOpen, onClose }): JSX.Element => {
-  let { prj_cd } = useParams();
+  let { source, prj_cd } = useParams();
 
-  const { data, status } = useQuery(["FN125Choices", prj_cd], () =>
-    getFN125Filters(prj_cd)
+  const { data, status } = useQuery(["FN125Choices", source, prj_cd], () =>
+    getFN125Filters(source, prj_cd)
   );
 
   const filters = useAppSelector((state) => state.FN125List);

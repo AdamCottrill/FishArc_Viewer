@@ -272,9 +272,9 @@ const spc_names = {
   800: "SCULPIN hybrids",
 };
 
-export async function getProjects(filters) {
+export async function getProjects(source, filters) {
   const data = api
-    .get("/fisharc/projects/", {
+    .get(`/${source}/projects/`, {
       params: filters,
       paramsSerializer: (params) =>
         queryString.stringify(params, { arrayFormat: "comma" }),
@@ -285,8 +285,8 @@ export async function getProjects(filters) {
   return data;
 }
 
-export const getFN011Filters = () =>
-  api.get("/fisharc/project_filters/").then((res) => {
+export const getFN011Filters = (source) => {
+  return api.get(`/${source}/project_filters/`).then((res) => {
     const { fof, project_types, suffixes, years } = res.data;
 
     const _fof = fof.map((x) => ({ value: x, label: `${x}_*` }));
@@ -310,21 +310,22 @@ export const getFN011Filters = () =>
       years: _years,
     };
   });
+};
 
-export const getProjectDetail = (project_code) =>
-  api.get(`/fisharc/project_detail/${project_code}/`).then((res) => res.data);
+export const getProjectDetail = (source, project_code) =>
+  api.get(`/${source}/project_detail/${project_code}/`).then((res) => res.data);
 
-export const get_fn_data = (project_code, table, filters) =>
+export const get_fn_data = (source, project_code, table, filters) =>
   api
-    .get(`/fisharc/${project_code}/${table}/`, {
+    .get(`/${source}/${project_code}/${table}/`, {
       params: filters,
       paramsSerializer: (params) =>
         queryString.stringify(params, { arrayFormat: "comma" }),
     })
     .then((res) => res.data);
 
-export const getFN121Filters = (project_code) =>
-  api.get(`/fisharc/${project_code}/fn121/choices/`).then((res) => {
+export const getFN121Filters = (source, project_code) =>
+  api.get(`/${source}/${project_code}/fn121/choices/`).then((res) => {
     const { stratum, fn022, fn026, fn028 } = res.data;
 
     const stratum__in = stratum.map((x) => ({
@@ -349,8 +350,8 @@ export const getFN121Filters = (project_code) =>
     return { stratum__in, ssn, space, mode };
   });
 
-export const getFN123Filters = (project_code) =>
-  api.get(`/fisharc/${project_code}/fn123/choices/`).then((res) => {
+export const getFN123Filters = (source, project_code) =>
+  api.get(`/${source}/${project_code}/fn123/choices/`).then((res) => {
     const { sams, effs, species, grps, stratum, fn022, fn026, fn028 } =
       res.data;
 
@@ -384,8 +385,8 @@ export const getFN123Filters = (project_code) =>
     return { sam, eff, spc, grp, stratum__in, ssn, space, mode };
   });
 
-export const getFN125Filters = (project_code) =>
-  api.get(`/fisharc/${project_code}/fn125/choices/`).then((res) => {
+export const getFN125Filters = (source, project_code) =>
+  api.get(`/${source}/${project_code}/fn125/choices/`).then((res) => {
     const { sams, effs, species, grps, stratum, fn022, fn026, fn028 } =
       res.data;
 
@@ -420,26 +421,26 @@ export const getFN125Filters = (project_code) =>
   });
 
 //export const getProjectSeasons = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn022/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn022/`).then((res) => res.data);
 //
 //export const getProjectDayTypes = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn023/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn023/`).then((res) => res.data);
 //
 //export const getProjectPeriods = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn025/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn025/`).then((res) => res.data);
 //
 //export const getProjectExceptionDates = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn025/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn025/`).then((res) => res.data);
 //
 //export const getProjectSpaces = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn026/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn026/`).then((res) => res.data);
 //
 //export const getProjectModes = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn028/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn028/`).then((res) => res.data);
 //
 //export const getProjectGears = (project_code) =>
-//  api.get(`/fisharc/${project_code}/fn013/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn013/`).then((res) => res.data);
 //
 //export const getProjectSubGears = (project_code, gr) =>
-//  api.get(`/fisharc/${project_code}/fn014/`).then((res) => res.data);
+//  api.get(`/${source}/${project_code}/fn014/`).then((res) => res.data);
 //

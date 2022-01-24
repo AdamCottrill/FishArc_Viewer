@@ -50,11 +50,11 @@ export const FN123: FC = () => {
     appDispatch(remove({ [name]: value }));
   };
 
-  let { prj_cd } = useParams();
+  let { source, prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["fn123", prj_cd, filters],
-    () => get_fn_data(prj_cd, "fn123", filters)
+    ["fn123", source, prj_cd, filters],
+    () => get_fn_data(source, prj_cd, "fn123", filters)
   );
 
   const columns = useMemo(
@@ -143,7 +143,11 @@ export const FN123: FC = () => {
     <Container my={4} maxW="container.xl">
       <Heading align="left" size="md" my={4}>
         FN123 records (Catch Counts) collected in{" "}
-        <Link color="teal.500" as={RouterLink} to={`/project_detail/${prj_cd}`}>
+        <Link
+          color="teal.500"
+          as={RouterLink}
+          to={`/${source}/project_detail/${prj_cd}`}
+        >
           {prj_cd}
         </Link>{" "}
         (N={nobs})

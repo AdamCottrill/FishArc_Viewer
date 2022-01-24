@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 import {
   IconButton,
@@ -6,16 +6,15 @@ import {
   Input,
   InputGroup,
   FormControl,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-import { SearchIcon } from '@chakra-ui/icons';
+import { SearchIcon } from "@chakra-ui/icons";
 
 export default function NabBarSearch() {
-  const [projectLike, setProjectLike] = useState('');
+  const [projectLike, setProjectLike] = useState("");
 
   const handleSubmit = (e) => {
-    console.log('Search term was:', projectLike);
-    setProjectLike('');
+    setProjectLike("");
   };
 
   return (

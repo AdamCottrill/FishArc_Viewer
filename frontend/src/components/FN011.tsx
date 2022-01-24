@@ -13,7 +13,7 @@ import {
 
 import { Link as RouterLink } from "react-router-dom";
 
-export const FN011 = ({ project }): FC => (
+export const FN011 = ({ source, project }): FC => (
   <Container p={8} borderWidth="1px" borderRadius="lg" maxW="container.xl">
     <Heading py={6}>
       {project.PRJ_NM} ({project.PRJ_CD})
@@ -37,17 +37,20 @@ export const FN011 = ({ project }): FC => (
         </Text>
         <Spacer />
         <HStack spacing={8} py={4}>
-          <Link as={RouterLink} to={`/samples/${project.PRJ_CD}`}>
+          <Link as={RouterLink} to={`/${source}/samples/${project.PRJ_CD}`}>
             <Button size="sm" colorScheme="teal" rounded="full">
               Samples
             </Button>
           </Link>
-          <Link as={RouterLink} to={`/catch_counts/${project.PRJ_CD}`}>
+          <Link
+            as={RouterLink}
+            to={`/${source}/catch_counts/${project.PRJ_CD}`}
+          >
             <Button size="sm" colorScheme="green" rounded="full">
               Catch Counts
             </Button>
           </Link>
-          <Link as={RouterLink} to={`/biosamples/${project.PRJ_CD}`}>
+          <Link as={RouterLink} to={`/${source}/biosamples/${project.PRJ_CD}`}>
             <Button size="sm" colorScheme="blue" rounded="full">
               Bio-Samples
             </Button>

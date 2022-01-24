@@ -28,10 +28,10 @@ import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
 import reducer from "./SideBarReducer";
 
 export const FN123Sidebar = ({ isOpen, onClose }): JSX.Element => {
-  let { prj_cd } = useParams();
+  let { source, prj_cd } = useParams();
 
-  const { data, status } = useQuery(["FN123Choices", prj_cd], () =>
-    getFN123Filters(prj_cd)
+  const { data, status } = useQuery(["FN123Choices", source, prj_cd], () =>
+    getFN123Filters(source, prj_cd)
   );
 
   const filters = useAppSelector((state) => state.FN123List);

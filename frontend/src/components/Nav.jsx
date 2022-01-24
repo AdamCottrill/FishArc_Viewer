@@ -11,20 +11,21 @@ import {
 } from "@chakra-ui/react";
 
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
-import NabBarSearch from "./NabBarSearch";
+
+import { useAppSelector } from "../store/hooks";
 
 export default function Nav() {
   const { colormode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue("white", "gray.800");
+
+  const source = useAppSelector((state) => state.DataSource);
+
   return (
     <Flex p={2} mb={6} borderWidth="1px" borderColor="gray.400" bg={bgColor}>
       <HStack spacing={4} px={4}>
-        <Link to="/">Projects</Link>
+        <Link to={`/${source.value}/`}>Projects</Link>
       </HStack>
-      <Spacer />
-      <Flex>
-        <NabBarSearch />
-      </Flex>
+
       <Spacer />
       <IconButton
         rounded="full"
