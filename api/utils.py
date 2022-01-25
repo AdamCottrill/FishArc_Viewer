@@ -7,7 +7,9 @@ DB_DIR = "./db"
 
 DB_SOURCES = {
     "fisharc":"fisharc.db",
-    "glarc":"GrandGrandWazoo.db"
+    "glarc":"GrandGrandWazoo.db",
+    "IM":"IM_projects.db",
+    "IAIS":"IAIS_projects.db",
 }
 
 
@@ -212,3 +214,112 @@ async def get_project_strata(source, prj_cd, table):
         "fn026": fn026,
         "fn028": fn028,
     }
+
+
+def sort_fields(fields, keyfields):
+    """sort our fields by key fields, other fieldss, and xfields, other
+    fields and x fields are sorted alphabetically while key fields re
+    sorted based on FN-hiearchy.
+
+
+    Arguments:
+    - `fields`:
+
+    """
+
+    myxfields = [x for x in fields if x.startswith("X")]
+    myxfields.sort()
+
+    myfields = [x for x in fields if not x.startswith("X")]
+
+    mykeyfields = list(set(keyfields).intersection(set(myfields)))
+    sortAccording(mykeyfields, keyfields)
+
+    myotherfields = list(set(myfields) - set(mykeyfields))
+    myotherfields.sort()
+
+    allfields = mykeyfields + myotherfields + myxfields
+
+    # move DBF_FILE to the end if it is included
+    if "DBF_FILE" in allfields:
+        allfields.append(allfields.pop(allfields.index("DBF_FILE")))
+
+    return allfields
+
+
+def sortAccording(A1, A2):
+    """taken from https://www.geeksforgeeks.org/sort-array-according-order-defined-another-array/"""
+    m = len(A1)
+    n = len(A2)
+    """The temp array is used to store a copy
+    of A1[] and visited[] is used mark the
+    visited elements in temp[]."""
+    temp = [0] * m
+    visited = [0] * m
+
+    for i in range(0, m):
+        temp[i] = A1[i]
+        visited[i] = 0
+
+    # Sort elements in temp
+    temp.sort()
+
+    # for index of output which is sorted A1[]
+    ind = 0
+
+    """Consider all elements of A2[], find
+    them in temp[] and copy to A1[] in order."""
+    for i in range(0, n):
+
+        # Find index of the first occurrence
+        # of A2[i] in temp
+        f = first(temp, 0, m - 1, A2[i], m)
+
+        # If not present, no need to proceed
+        if f == -1:
+            continue
+
+        # Copy all occurrences of A2[i] to A1[]
+        j = f
+        while j < m and temp[j] == A2[i]:
+            A1[ind] = temp[j]
+            ind = ind + 1
+            visited[j] = 1
+            j = j + 1
+
+    # Now copy all items of temp[] which are
+    # not present in A2[]
+    for i in range(0, m):
+        if visited[i] == 0:
+            A1[ind] = temp[i]
+            ind = ind + 1
+
+
+
+def first(arr, low, high, x, n):
+    """taken from https://www.geeksforgeeks.org/sort-array-according-order-defined-another-array/"""
+    if high >= low:
+        mid = low + (high - low) // 2
+        # (low + high)/2;
+        if (mid == 0 or x > arr[mid - 1]) and arr[mid] == x:
+            return mid
+        if x > arr[mid]:
+            return first(arr, (mid + 1), high, x, n)
+        return first(arr, low, (mid - 1), x, n)
+
+    return -1
+
+
+async def get_field_names(
+    project_type,
+    table_name,
+):
+    """Get the known field names for this table.  This could be a cache some day."""
+    # sql = "SELECT * FROM [{}]".format(table_name)
+    sql = "PRAGMA table_info( [{}] );".format(table_name)
+
+    data = await run_query(project_type, sql)
+    if data:
+        return [x.get("name") for x in data]
+    else:
+        return []
