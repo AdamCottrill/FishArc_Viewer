@@ -4,17 +4,18 @@ import { Box, Container } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 
-import MySpinner from "../components/MySpinner";
-import { getProjectDetail } from "../services/api";
-import { FN011 } from "../components/FN011";
-import { FN012 } from "../components/FN012";
-import { FN022 } from "../components/FN022";
-import { FN023 } from "../components/FN023";
-//import { FN024 } from "../components/FN024";
-import { FN025 } from "../components/FN025";
-import { FN026 } from "../components/FN026";
-import { FN028 } from "../components/FN028";
-import { FN013 } from "../components/FN013";
+import MySpinner from "../../components/MySpinner";
+import { getProjectDetail } from "../../services/api";
+
+import { FN011 } from "./FN011";
+import { FN012 } from "./FN012";
+import { FN022 } from "./FN022";
+import { FN023 } from "./FN023";
+//import { FN024 } from "./FN024";
+import { FN025 } from "./FN025";
+import { FN026 } from "./FN026";
+import { FN028 } from "./FN028";
+import { FN013 } from "./FN013";
 
 export const ProjectDetail: FC = () => {
   let { source, prj_cd } = useParams();

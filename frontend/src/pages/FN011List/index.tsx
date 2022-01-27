@@ -3,21 +3,23 @@ import { Link as RouterLink, useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { Link, Heading, Container, useDisclosure } from "@chakra-ui/react";
 
-import { getProjects } from "../services/api";
+import { getProjects } from "../../services/api";
 
 import {
   useAppSelector,
   useAppDispatch,
   useCustomSearchParams,
-} from "../store/hooks";
-import { update, remove } from "../store/slices/FN011ListFilterSlice";
+} from "../../store/hooks";
 
-import MySpinner from "../components/MySpinner";
-import SortableTable from "../components/SortableTable";
-import DataSourceRadioButtons from "../components/DataSourceRadios";
+import { update, remove } from "../../store/slices/FN011ListFilterSlice";
 
-import { FN011Sidebar } from "../components/FN011Sidebar";
-import { TableControls } from "../components/TableControls";
+import MySpinner from "../../components/MySpinner";
+import SortableTable from "../../components/SortableTable";
+import DataSourceRadioButtons from "../../components/DataSourceRadios";
+import { TableControls } from "../../components/TableControls";
+
+import { FN011Sidebar } from "./FN011Sidebar";
+
 //import { FilterDrawer } from "../components/FilterDrawer";
 
 export function FN011List() {

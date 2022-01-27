@@ -5,7 +5,7 @@ import { update } from "../../store/slices/FieldStatsSlice";
 
 import { getTables } from "../../services/api";
 
-import SidebarRadioInput from "./../SidebarRadioInput/SidebarRadioInput";
+import SidebarRadioInput from "../../components/SidebarRadioInput/SidebarRadioInput";
 
 const SideBarTableRadioButtons = (props) => {
   const { table: selectedTable, projectType } = useAppSelector(

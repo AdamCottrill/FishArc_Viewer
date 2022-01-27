@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { update } from "../../store/slices/FieldStatsSlice";
 
 import { getTableFields } from "../../services/api";
-import SidebarRadioInput from "../SidebarRadioInput/SidebarRadioInput";
+import SidebarRadioInput from "../../components/SidebarRadioInput/SidebarRadioInput";
 
 const SideBarFieldRadioButtons = (props) => {
   // when the selectedTable changes - update the list of fields in state

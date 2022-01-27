@@ -18,22 +18,23 @@ import {
   DrawerCloseButton,
 } from "@chakra-ui/react";
 
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { update } from "../store/slices/FN121ListFilterSlice";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { update } from "../../store/slices/FN123ListFilterSlice";
 
-import { getFN121Filters } from "../services/api";
-import { FilterCheckBoxes } from "../components/FilterCheckBoxes";
+import { getFN123Filters } from "../../services/api";
+import { FilterCheckBoxes } from "../../components/FilterCheckBoxes";
 
-import reducer from "./SideBarReducer";
+//import { addFilter, popFilter } from "../../utils";
+import reducer from "../../components/SideBarReducer";
 
-export const FN121Sidebar = ({ isOpen, onClose }): JSX.Element => {
+export const FN123Sidebar = ({ isOpen, onClose }): JSX.Element => {
   let { source, prj_cd } = useParams();
 
-  const { data, status } = useQuery(["FN121Choices", source, prj_cd], () =>
-    getFN121Filters(source, prj_cd)
+  const { data, status } = useQuery(["FN123Choices", source, prj_cd], () =>
+    getFN123Filters(source, prj_cd)
   );
 
-  const filters = useAppSelector((state) => state.FN121List);
+  const filters = useAppSelector((state) => state.FN123List);
   const appDispatch = useAppDispatch();
 
   const [state, dispatch] = useReducer(reducer, { ...filters });
@@ -171,6 +172,88 @@ export const FN121Sidebar = ({ isOpen, onClose }): JSX.Element => {
                       </AccordionPanel>
                     </AccordionItem>
                   </Accordion>
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">
+                      Sample
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <FilterCheckBoxes
+                    name="sam__in"
+                    items={data?.sam}
+                    status={status}
+                    filters={state}
+                    handleChange={handleCheckBoxChange}
+                    showFilterInput={true}
+                  />
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">
+                      Effort
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <FilterCheckBoxes
+                    name="eff__in"
+                    items={data?.eff}
+                    status={status}
+                    filters={state}
+                    handleChange={handleCheckBoxChange}
+                  />
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">
+                      Group Code
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <FilterCheckBoxes
+                    name="grp__in"
+                    items={data?.grp}
+                    status={status}
+                    filters={state}
+                    handleChange={handleCheckBoxChange}
+                  />
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">
+                      Species
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <FilterCheckBoxes
+                    name="spc__in"
+                    items={data?.spc}
+                    status={status}
+                    filters={state}
+                    handleChange={handleCheckBoxChange}
+                    showFilterInput={true}
+                  />
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>

@@ -1,6 +1,6 @@
 import { FC, useMemo } from "react";
 import { Container, Heading } from "@chakra-ui/react";
-import SortableTable from "../components/SortableTable";
+import SortableTable from "../../components/SortableTable";
 
 export const FN025 = ({ data }): FC => {
   const columns = useMemo(

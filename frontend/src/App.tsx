@@ -1,5 +1,5 @@
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 //import { ReactQueryDevtools } from "react-query/devtools";
 import { Provider } from "react-redux";
@@ -31,17 +31,19 @@ function App() {
               <Routes>
                 <Route path=":source/" element={<FN011List />}></Route>
                 <Route
-                  path=":source/project_detail/:prj_cd"
+                  path=":source/project_detail/:prj_cd/"
                   element={<ProjectDetail />}
                 />
-                <Route path=":source/samples/:prj_cd" element={<FN121 />} />
+                <Route path=":source/samples/:prj_cd/" element={<FN121 />} />
                 <Route
-                  path=":source/catch_counts/:prj_cd"
+                  path=":source/catch_counts/:prj_cd/"
                   element={<FN123 />}
                 />
-                <Route path=":source/biosamples/:prj_cd" element={<FN125 />} />
+                <Route path=":source/biosamples/:prj_cd/" element={<FN125 />} />
 
-                <Route path="field_stats" element={<FieldStats />} />
+                <Route path="field_stats/" element={<FieldStats />} />
+
+                <Route path="/" element={<Navigate to="glarc/" />} />
 
                 <Route
                   path="*"

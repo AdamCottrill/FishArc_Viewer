@@ -4,19 +4,19 @@ import { Heading, Container, Link, useDisclosure } from "@chakra-ui/react";
 import { useParams, Link as RouterLink } from "react-router-dom";
 import { useQuery } from "react-query";
 
-import SortableTable from "../components/SortableTable";
-import Spinner from "../components/MySpinner";
-import { FN121Sidebar } from "../components/FN121Sidebar";
-import { TableControls } from "../components/TableControls";
-//import { FilterDrawer } from "./components/FilterDrawer";
-import { get_fn_data } from "../services/api";
+import SortableTable from "../../components/SortableTable";
+import Spinner from "../../components/MySpinner";
+import { TableControls } from "../../components/TableControls";
+import { get_fn_data } from "../../services/api";
 
 import {
   useAppSelector,
   useAppDispatch,
   useCustomSearchParams,
-} from "../store/hooks";
-import { update, remove } from "../store/slices/FN121ListFilterSlice";
+} from "../../store/hooks";
+import { update, remove } from "../../store/slices/FN121ListFilterSlice";
+
+import { FN121Sidebar } from "./FN121Sidebar";
 
 export const FN121: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();

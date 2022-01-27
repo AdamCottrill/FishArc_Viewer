@@ -4,26 +4,27 @@ import { Heading, Container, Link, useDisclosure } from "@chakra-ui/react";
 import { useParams, Link as RouterLink } from "react-router-dom";
 import { useQuery } from "react-query";
 
-import SortableTable from "../components/SortableTable";
-import Spinner from "../components/MySpinner";
-import { FN125Sidebar } from "../components/FN125Sidebar";
-import { TableControls } from "../components/TableControls";
-//import { FilterDrawer } from "./components/FilterDrawer";
-import { get_fn_data } from "../services/api";
+import SortableTable from "../../components/SortableTable";
+import Spinner from "../../components/MySpinner";
+import { TableControls } from "../../components/TableControls";
+
+import { get_fn_data } from "../../services/api";
 
 import {
   useAppSelector,
   useAppDispatch,
   useCustomSearchParams,
-} from "../store/hooks";
-import { update, remove } from "../store/slices/FN125ListFilterSlice";
+} from "../../store/hooks";
+import { update, remove } from "../../store/slices/FN123ListFilterSlice";
 
-export const FN125: FC = () => {
+import { FN123Sidebar } from "./FN123Sidebar";
+
+export const FN123: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
   let [searchAsObject, setSearch] = useCustomSearchParams();
 
-  const filters = useAppSelector((state) => state.FN125List);
+  const filters = useAppSelector((state) => state.FN123List);
   const appDispatch = useAppDispatch();
 
   useEffect(() => {
@@ -53,8 +54,8 @@ export const FN125: FC = () => {
   let { source, prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
-    ["fn125", source, prj_cd, filters],
-    () => get_fn_data(source, prj_cd, "fn125", filters)
+    ["fn123", source, prj_cd, filters],
+    () => get_fn_data(source, prj_cd, "fn123", filters)
   );
 
   const columns = useMemo(
@@ -81,73 +82,38 @@ export const FN125: FC = () => {
       },
 
       {
-        Header: "FISH",
-        accessor: "FISH",
+        Header: "CATCNT",
+        accessor: "CATCNT",
       },
 
       {
-        Header: "FLEN",
-        accessor: "FLEN",
+        Header: "BIOCNT",
+        accessor: "BIOCNT",
       },
 
       {
-        Header: "TLEN",
-        accessor: "TLEN",
+        Header: "RLSCNT",
+        accessor: "RLSCNT",
       },
 
       {
-        Header: "RWT",
-        accessor: "RWT",
+        Header: "MESCNT",
+        accessor: "MESCNT",
       },
 
       {
-        Header: "SEX",
-        accessor: "SEX",
+        Header: "MESWT",
+        accessor: "MESWT",
       },
 
       {
-        Header: "MAT",
-        accessor: "MAT",
+        Header: "MRKCNT",
+        accessor: "MRKCNT",
       },
 
       {
-        Header: "GON",
-        accessor: "GON",
-      },
-
-      {
-        Header: "AGE",
-        accessor: "AGE",
-      },
-
-      {
-        Header: "AGEST",
-        accessor: "AGEST",
-      },
-
-      {
-        Header: "TISSUE",
-        accessor: "TISSUE",
-      },
-
-      {
-        Header: "TAGID",
-        accessor: "TAGID",
-      },
-
-      {
-        Header: "TAGDOC",
-        accessor: "TAGDOC",
-      },
-
-      {
-        Header: "TAGSTAT",
-        accessor: "TAGSTAT",
-      },
-
-      {
-        Header: "COMMENT5",
-        accessor: "COMMENT5",
+        Header: "COMMENT3",
+        accessor: "COMMENT3",
       },
     ],
     []
@@ -168,7 +134,7 @@ export const FN125: FC = () => {
   }
 
   if (isLoading || isFetching) {
-    const spinnerMessage = `Fetching Bio-Data`;
+    const spinnerMessage = `Fetching Samples`;
     return <Spinner message={spinnerMessage} />;
   }
 
@@ -177,7 +143,7 @@ export const FN125: FC = () => {
   return (
     <Container my={4} maxW="container.xl">
       <Heading align="left" size="md" my={4}>
-        FN125 records (Biological Samples) collected in{" "}
+        FN123 records (Catch Counts) collected in{" "}
         <Link
           color="teal.500"
           as={RouterLink}
@@ -200,10 +166,10 @@ export const FN125: FC = () => {
       {data.data.length ? (
         <SortableTable columns={columns} data={data.data} />
       ) : (
-        <p>It doesn't look like there any FN125 Records</p>
+        <p>It doesn't look like there any FN123 Records</p>
       )}
 
-      <FN125Sidebar isOpen={isOpen} onClose={onClose} />
+      <FN123Sidebar isOpen={isOpen} onClose={onClose} />
     </Container>
   );
 };

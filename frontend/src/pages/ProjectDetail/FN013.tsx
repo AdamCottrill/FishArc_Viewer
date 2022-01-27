@@ -1,7 +1,7 @@
 import React, { FC, useMemo } from "react";
 import { Container, Heading } from "@chakra-ui/react";
 
-import SortableTable from "../components/SortableTable";
+import SortableTable from "../../components/SortableTable";
 
 export function FN013({ fn013, fn014 }): FC {
   let data;

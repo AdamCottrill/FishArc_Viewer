@@ -12,13 +12,13 @@ import {
   Heading,
 } from "@chakra-ui/react";
 
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector } from "../../store/hooks";
 
-import { getFieldStats } from "../services/api";
+import { getFieldStats } from "../../services/api";
 
-import { Spinner } from "../components/Spinner";
-import StatsSideBar from "../components/FieldStats/StatsSideBar";
-import ShowFieldStats from "../components/FieldStats/ShowFieldStats";
+import { Spinner } from "../../components/Spinner";
+import StatsSideBar from "./StatsSideBar";
+import ShowFieldStats from "./ShowFieldStats";
 
 export function FieldStats() {
   const {
