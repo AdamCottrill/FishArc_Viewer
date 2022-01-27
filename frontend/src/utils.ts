@@ -61,3 +61,13 @@ export const popFilter = (values, setValues, key, value) => {
   }
   setValues({ ...current });
 };
+
+
+export const projectTypes = [
+  ["CFCD", "Catch Sampling"],
+  ["IAIS", "Netting"],
+  ["IM", "Fishway"],
+  ["SC", "Creels"],
+  ["SD", "Sport Diary"],
+  ["SF", "Sport Fish"],
+];

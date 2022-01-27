@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import DataSource from "./slices/DataSourceSlice";
+import FieldStats from "./slices/FieldStatsSlice";
 import FN011ListFilter from "./slices/FN011ListFilterSlice";
 import FN121ListFilter from "./slices/FN121ListFilterSlice";
 import FN123ListFilter from "./slices/FN123ListFilterSlice";
@@ -8,6 +9,7 @@ import FN125ListFilter from "./slices/FN125ListFilterSlice";
 
 export const store = configureStore({
   reducer: {
+    FieldStats: FieldStats,
     DataSource: DataSource,
     FN011List: FN011ListFilter,
     FN121List: FN121ListFilter,

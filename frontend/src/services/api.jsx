@@ -420,27 +420,16 @@ export const getFN125Filters = (source, project_code) =>
     return { sam, eff, spc, grp, stratum__in, ssn, space, mode };
   });
 
-//export const getProjectSeasons = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn022/`).then((res) => res.data);
-//
-//export const getProjectDayTypes = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn023/`).then((res) => res.data);
-//
-//export const getProjectPeriods = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn025/`).then((res) => res.data);
-//
-//export const getProjectExceptionDates = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn025/`).then((res) => res.data);
-//
-//export const getProjectSpaces = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn026/`).then((res) => res.data);
-//
-//export const getProjectModes = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn028/`).then((res) => res.data);
-//
-//export const getProjectGears = (project_code) =>
-//  api.get(`/${source}/${project_code}/fn013/`).then((res) => res.data);
-//
-//export const getProjectSubGears = (project_code, gr) =>
-//  api.get(`/${source}/${project_code}/fn014/`).then((res) => res.data);
-//
+//===================================================
+// field stats:
+
+export const getTables = (projectType) =>
+  api.get(`/${projectType}/tables`).then((res) => res.data);
+
+export const getTableFields = (projectType, tablename) =>
+  api.get(`/${projectType}/${tablename}/fields`).then((res) => res.data);
+
+export const getFieldStats = (projectType, tablename, fieldname) =>
+  api
+    .get(`/field_stats/${projectType}/${tablename}/${fieldname}/`)
+    .then((res) => res.data);

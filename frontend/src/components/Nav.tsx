@@ -24,6 +24,7 @@ export default function Nav() {
     <Flex p={2} mb={6} borderWidth="1px" borderColor="gray.400" bg={bgColor}>
       <HStack spacing={4} px={4}>
         <Link to={`/${source.value}/`}>Projects</Link>
+        <Link to={"/field_stats"}>Field Stats</Link>
       </HStack>
 
       <Spacer />
