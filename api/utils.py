@@ -6,12 +6,17 @@ from databases import Database
 DB_DIR = "./db"
 
 DB_SOURCES = {
-    "fisharc":"fisharc.db",
-    "glarc":"GrandGrandWazoo.db",
-    "IM":"IM_projects.db",
-    "IAIS":"IAIS_projects.db",
+    "fisharc": "fisharc.db",
+    "glarc": "GrandGrandWazoo.db",
+    "IM": "IM_projects.db",
+    "IAIS": "IAIS_projects.db",
+    "CFCD": "CFCD_projects.db",
+    "SC": "SC_projects.db",
+    "SD": "SD_projects.db",
+    "SF": "SF_projects.db",
+    "TR": "TR_projects.db",
+    "FF": "FieldFinder.db",
 }
-
 
 
 async def run_query(source, sql, fetchone=False):
@@ -21,7 +26,7 @@ async def run_query(source, sql, fetchone=False):
     - `sql`:
     """
 
-    src = source if source in DB_SOURCES else 'fisharc'
+    src = source if source in DB_SOURCES else "fisharc"
     fndb = os.path.join(DB_DIR, DB_SOURCES.get(src))
 
     database = Database(f"sqlite:///{fndb}")
@@ -293,7 +298,6 @@ def sortAccording(A1, A2):
         if visited[i] == 0:
             A1[ind] = temp[i]
             ind = ind + 1
-
 
 
 def first(arr, low, high, x, n):

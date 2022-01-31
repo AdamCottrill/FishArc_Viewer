@@ -9,10 +9,10 @@ from utils import (
     get_sam_eff_spc_grps,
     run_query,
     get_substring_sql,
-    #get_strata_filter_sql,
+    # get_strata_filter_sql,
     get_where_sql,
     get_field_names,
-    sort_fields
+    sort_fields,
 )
 
 api = Quart(__name__, static_folder="build", static_url_path="/")
@@ -26,7 +26,6 @@ FN_KEYFIELDS = ["PRJ_CD", "SAM", "EFF", "SPC", "GRP", "FISH", "AGEID"]
 #     """Return the template that will render our react app"""
 #     print(api.static_folder)
 #     return send_from_directory(api.static_folder, "index.html")
-
 
 
 @api.route("/")
@@ -282,8 +281,8 @@ async def get_project_detail(source, prj_cd):
     }
 
 
+# ============================================
 
-#============================================
 
 @api.route("/api/<source>/tables")
 async def get_database_tables(source):
@@ -310,7 +309,6 @@ async def get_table_fields(source, table_name):
     sortedFields = sort_fields(fields, FN_KEYFIELDS)
 
     return {"fields": sortedFields}
-
 
 
 @api.route("/api/distinct/<source>/<table_name>/<field_name>/")
@@ -465,6 +463,45 @@ async def field_stats(source, table_name, field_name):
         "common_values": list(common_values),
     }
 
+
+@api.route("/api/field_finder/")
+async def field_finder():
+    """"""
+
+    filters = request.args
+
+    select_sql = (
+        "SELECT src, tablename, fieldname, records FROM field_use where records <> 0 "
+    )
+
+    if "fieldname" in filters:
+        fieldname = filters["fieldname"]
+        fld_sql = f" and upper([fieldname]) like upper('%{fieldname}%') "
+    else:
+        fld_sql = ""
+
+    if "tablename" in filters:
+        tablename = filters["tablename"]
+        table_sql = f" and upper([tablename]) like upper('%{tablename}%') "
+    else:
+        table_sql = ""
+
+    if "src" in filters:
+        src = filters["src"]
+        sources = ", ".join([f"'{x}'" for x in src.split(",")])
+        src_sql = f" and src in ({sources}) "
+    else:
+        src_sql = ""
+
+    limit = "order by fieldname, records desc, tablename limit 200;"
+
+    sql = select_sql + fld_sql + table_sql + src_sql + limit
+
+    print(sql)
+
+    rs = await run_query("FF", sql)
+
+    return {"data": rs}
 
 
 api.run()
