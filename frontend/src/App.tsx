@@ -16,6 +16,7 @@ import { FN121 } from "./pages/FN121";
 import { FN123 } from "./pages/FN123";
 import { FN125 } from "./pages/FN125";
 import { FieldStats } from "./pages/FieldStats";
+import { FieldFinder } from "./pages/FieldFinder";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ function App() {
                 <Route path=":source/biosamples/:prj_cd/" element={<FN125 />} />
 
                 <Route path="field_stats/" element={<FieldStats />} />
+                <Route path="field_finder/" element={<FieldFinder />} />
 
                 <Route path="/" element={<Navigate to="glarc/" />} />
 

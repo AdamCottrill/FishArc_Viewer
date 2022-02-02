@@ -433,3 +433,15 @@ export const getFieldStats = (projectType, tablename, fieldname) =>
   api
     .get(`/field_stats/${projectType}/${tablename}/${fieldname}/`)
     .then((res) => res.data);
+
+export async function getFoundFields(filters) {
+  const data = api
+    .get("/field_finder/", {
+      params: filters,
+      paramsSerializer: (params) =>
+        queryString.stringify(params, { arrayFormat: "comma" }),
+    })
+    .then((response) => response.data);
+
+  return data;
+}

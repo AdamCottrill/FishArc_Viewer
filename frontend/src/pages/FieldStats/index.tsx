@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
 
 import {
@@ -12,7 +13,12 @@ import {
   Heading,
 } from "@chakra-ui/react";
 
-import { useAppSelector } from "../../store/hooks";
+import {
+  useAppSelector,
+  useAppDispatch,
+  useCustomSearchParams,
+} from "../../store/hooks";
+import { update } from "../../store/slices/FieldStatsSlice";
 
 import { getFieldStats } from "../../services/api";
 
@@ -21,16 +27,22 @@ import StatsSideBar from "./StatsSideBar";
 import ShowFieldStats from "./ShowFieldStats";
 
 export function FieldStats() {
-  const {
-    field: selectedField,
-    table: selectedTable,
-    projectType,
-  } = useAppSelector((state) => state.FieldStats);
+  let [searchAsObject, setSearch] = useCustomSearchParams();
+  const appDispatch = useAppDispatch();
 
-  let queryEnabled = (selectedField && selectedField !== null) === true;
+  useEffect(() => {
+    appDispatch(update(searchAsObject));
+  }, []);
+
+  const selected = useAppSelector((state) => state.FieldStats);
+
+  let { field, table, projectType } = selected;
+
+  let queryEnabled = (field && field !== null) === true;
+
   const { data, error, isFetching } = useQuery(
-    ["field-stats", projectType, selectedTable, selectedField],
-    () => getFieldStats(projectType, selectedTable, selectedField),
+    ["field-stats", projectType, table, field],
+    () => getFieldStats(projectType, table, field),
     {
       enabled: queryEnabled,
     }
@@ -56,7 +68,12 @@ export function FieldStats() {
     );
   }
 
-  //const spinnerMessage = `Fetching Data for "${selectedField}" from the ${selectedTable} table`;
+  //update the url query search parameters each time the filters change
+  useEffect(() => {
+    setSearch({ ...selected });
+  }, [selected]);
+
+  //const spinnerMessage = `Fetching Data for "${field}" from the ${table} table`;
 
   return (
     <HStack align="top" spacing="30px" flex="1">
@@ -64,11 +81,11 @@ export function FieldStats() {
         <StatsSideBar />
       </Flex>
       <Box flex="1">
-        {selectedField ? (
+        {field ? (
           isFetching ? (
             <Spinner />
           ) : (
-            <ShowFieldStats data={data} />
+            <ShowFieldStats data={data} field={field} table={table} />
           )
         ) : (
           <Flex align="center" border="1px" p={25} borderRadius={15} m={10}>
@@ -78,8 +95,8 @@ export function FieldStats() {
               </Heading>
               <Flex pt={4}>
                 Select a field from the menu on the left to see a summary of how
-                and when that field has been used in the {selectedTable} table
-                of {projectType} projects.
+                and when that field has been used in the {table} table of{" "}
+                {projectType} projects.
               </Flex>
             </VStack>
           </Flex>

@@ -25,6 +25,7 @@ export default function Nav() {
       <HStack spacing={4} px={4}>
         <Link to={`/${source.value}/`}>Projects</Link>
         <Link to={"/field_stats"}>Field Stats</Link>
+        <Link to={"/field_finder"}>Field Finder</Link>
       </HStack>
 
       <Spacer />

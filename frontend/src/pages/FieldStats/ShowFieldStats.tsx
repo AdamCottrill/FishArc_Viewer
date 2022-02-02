@@ -11,14 +11,8 @@ import {
   Td,
 } from "@chakra-ui/react";
 
-import { useAppSelector } from "../../store/hooks";
-
 export default function ShowFieldStats(props) {
-  const { data } = props;
-
-  const { field: selectedField, table: selectedTable } = useAppSelector(
-    (state) => state.FieldStats
-  );
+  const { data, field, table } = props;
 
   return (
     <Flex mt={10}>
@@ -29,17 +23,19 @@ export default function ShowFieldStats(props) {
           data.distinct_values &&
           data.prj_cds ? (
             <Heading as="h3" size="md">
-              <strong>"{selectedField}"</strong> appears in{" "}
+              <strong>"{field}"</strong> appears in{" "}
               {data.occurence_count.N.toLocaleString()} record
-              {data.occurence_count.N > 1 && "s"} in {data.prj_cds.N} project
+              {data.occurence_count.N > 1 && "s"} in the {table} table.
+              <br />
+              It is associated with {data.prj_cds.N} project
               {data.prj_cds.N > 1 && "s"} and has {data.distinct_values.N}{" "}
-              distinct value{data.distinct_values.N > 1 && "s"}.
+              distinct value
+              {data.distinct_values.N > 1 && "s"}.
             </Heading>
           ) : (
             <Heading as="h3" size="md">
-              Oops! <strong>"{selectedField}"</strong> does not appear in{" "}
-              {selectedTable}! Please double check the selected field:
-              selectedField.
+              Oops! <strong>"{field}"</strong> does not appear in {table}!
+              Please double check the table and selected field.
             </Heading>
           )}
         </Flex>
@@ -58,7 +54,12 @@ export default function ShowFieldStats(props) {
               <Tbody>
                 {data.project_counts &&
                   data.project_counts.map((project) => (
-                    <Tr key={project.PRJ_CD}>
+                    <Tr
+                      key={
+                        project.PRJ_CD ||
+                        (Math.random() + 1).toString(36).substring(7)
+                      }
+                    >
                       <Td>{project.PRJ_CD}</Td>
                       <Td>{project.N}</Td>
                     </Tr>
@@ -80,7 +81,12 @@ export default function ShowFieldStats(props) {
               <Tbody>
                 {data.common_values &&
                   data.common_values.map((val) => (
-                    <Tr key={val.value}>
+                    <Tr
+                      key={
+                        val.value ||
+                        (Math.random() + 1).toString(36).substring(7)
+                      }
+                    >
                       <Td>{val.value}</Td>
                       <Td>{val.N}</Td>
                     </Tr>
