@@ -1,7 +1,9 @@
+import { Link as RouterLink } from "react-router-dom";
 import {
   Flex,
   HStack,
   Heading,
+  Link,
   VStack,
   Table,
   Tbody,
@@ -60,7 +62,15 @@ export default function ShowFieldStats(props) {
                         (Math.random() + 1).toString(36).substring(7)
                       }
                     >
-                      <Td>{project.PRJ_CD}</Td>
+                      <Td>
+                        <Link
+                          color="teal.500"
+                          as={RouterLink}
+                          to={`/glarc/project_detail/${project.PRJ_CD}`}
+                        >
+                          {project.PRJ_CD}
+                        </Link>
+                      </Td>
                       <Td>{project.N}</Td>
                     </Tr>
                   ))}

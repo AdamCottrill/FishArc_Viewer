@@ -497,8 +497,6 @@ async def field_finder():
 
     sql = select_sql + fld_sql + table_sql + src_sql + limit
 
-    print(sql)
-
     rs = await run_query("FF", sql)
 
     return {"data": rs}

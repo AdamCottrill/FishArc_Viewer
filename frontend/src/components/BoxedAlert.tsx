@@ -9,8 +9,6 @@ import {
   Center,
 } from "@chakra-ui/react";
 
-import { WarningIcon } from "@chakra-ui/icons";
-
 type Props = {
   title?: string;
   description?: string;

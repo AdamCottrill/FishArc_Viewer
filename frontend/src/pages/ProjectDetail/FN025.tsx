@@ -20,7 +20,7 @@ export const FN025 = ({ data }): FC => {
   return (
     <Container py={2} maxW="container.xl">
       <Heading align="left" size="md" my={4}>
-        Exception Dates (FN022)
+        Exception Dates (FN025)
       </Heading>
       {data.length ? (
         <SortableTable columns={columns} data={data} />
