@@ -1,6 +1,8 @@
 import os
 from typing import List
-from databases import Database
+#from databases import Database
+from collections import OrderedDict
+import sqlite3
 
 # DB_DIR = "/home/adam/Documents/sandbox/"
 DB_DIR = "./db"
@@ -19,26 +21,32 @@ DB_SOURCES = {
 }
 
 
-async def run_query(source, sql, fetchone=False):
-    """
+def dict_factory(cursor, row):
 
+    d = OrderedDict()
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
+def run_query(source, sql,  fetchone=False):
+    """
     Arguments:
     - `sql`:
     """
 
-    src = source if source in DB_SOURCES else "fisharc"
-    fndb = os.path.join(DB_DIR, DB_SOURCES.get(src))
+    fndb = os.path.join(DB_DIR, DB_SOURCES[source])
 
-    database = Database(f"sqlite:///{fndb}")
     data = {}
 
-    if fetchone:
-        one = await database.fetch_one(sql)
-        data = dict(one)
-    else:
-        all = await database.fetch_all(sql)
-        # data = [{k: v for k, v in x.items()} for x in all]
-        data = [dict(row) for row in all]
+    with sqlite3.connect(fndb) as con:
+        con.row_factory = dict_factory
+        cursor = con.cursor()
+        cursor.execute(sql)
+        if fetchone:
+            data = cursor.fetchone()
+        else:
+            data = cursor.fetchall()
     return data
 
 
@@ -151,25 +159,25 @@ def get_where_sql(filters: dict, fields: List[str]) -> str:
     return where
 
 
-async def get_sam_eff_spc_grps(source, prj_cd, table):
+def get_sam_eff_spc_grps(source, prj_cd, table):
 
     sql = f"select distinct sam as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     sams = [x["value"] for x in rs]
     sams.sort()
 
     sql = f"select distinct eff as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     effs = [x["value"] for x in rs]
     effs.sort()
 
     sql = f"select distinct grp as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     grps = [x["value"] for x in rs]
     grps.sort()
 
     sql = f"select distinct spc as value from {table} where prj_cd ='{prj_cd}';"
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     species = [x["value"] for x in rs]
     species.sort()
 
@@ -181,35 +189,35 @@ async def get_sam_eff_spc_grps(source, prj_cd, table):
     }
 
 
-async def get_project_strata(source, prj_cd, table):
+def get_project_strata(source, prj_cd, table):
     """return a dictionary containing the distinct strata from each design
     table for teh given project."""
 
     sql = f"""select distinct stratum
     from {table} where prj_cd = '{prj_cd}' order by stratum;"""
-    stratum = await run_query(source, sql)
+    stratum =  run_query(source, sql)
 
     sql = f"""select distinct ssn, ssn_des
     from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
-    fn022 = await run_query(source, sql)
+    fn022 =  run_query(source, sql)
 
     sql = f"""select distinct dtp, DTP_NM
     from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
-    fn023 = await run_query(source, sql)
+    fn023 =  run_query(source, sql)
 
     sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
     from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
-    fn024 = await run_query(source, sql)
+    fn024 =  run_query(source, sql)
 
     sql = f"""select distinct space, space_des from
     fn026 where prj_cd = '{prj_cd}' order by space;"""
 
-    fn026 = await run_query(source, sql)
+    fn026 =  run_query(source, sql)
 
     sql = f"""select distinct mode, mode_des from fn028 where
     prj_cd = '{prj_cd}' order by mode;"""
 
-    fn028 = await run_query(source, sql)
+    fn028 =  run_query(source, sql)
 
     return {
         "stratum": stratum,
@@ -314,7 +322,7 @@ def first(arr, low, high, x, n):
     return -1
 
 
-async def get_field_names(
+def get_field_names(
     project_type,
     table_name,
 ):
@@ -322,7 +330,7 @@ async def get_field_names(
     # sql = "SELECT * FROM [{}]".format(table_name)
     sql = "PRAGMA table_info( [{}] );".format(table_name)
 
-    data = await run_query(project_type, sql)
+    data =  run_query(project_type, sql)
     if data:
         return [x.get("name") for x in data]
     else:

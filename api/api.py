@@ -1,9 +1,11 @@
 # import sqlite3
 
-# from flask import Flask, request,
-from quart import Quart, request, send_from_directory
+from flask import Flask, request
+#from quart import Quart, request, send_from_directory
 
-from utils import (
+
+
+from .utils import (
     build_sql_filter,
     get_project_strata,
     get_sam_eff_spc_grps,
@@ -15,7 +17,7 @@ from utils import (
     sort_fields,
 )
 
-api = Quart(__name__, static_folder="build", static_url_path="/")
+api = Flask(__name__, static_folder="build", static_url_path="/")
 api.config["JSON_SORT_KEYS"] = False
 
 ROW_LIMIT = 200
@@ -29,13 +31,13 @@ FN_KEYFIELDS = ["PRJ_CD", "SAM", "EFF", "SPC", "GRP", "FISH", "AGEID"]
 
 
 @api.route("/")
-async def react_app():
+def react_app():
     """Return the template that will render our react app"""
-    return await send_from_directory(api.static_folder, "index.html")
+    return send_from_directory(api.static_folder, "index.html")
 
 
 @api.route("/api/<source>/projects/")
-async def get_projects(source):
+def get_projects(source):
     """"""
 
     PAGE_SIZE = 100
@@ -66,7 +68,7 @@ async def get_projects(source):
     where = where + substrings + conjugate + selectors
     sql = sql + where + f" limit {limit} offset {offset};"
 
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     for record in rs:
         prj_nm = record["PRJ_NM"]
         record["PRJ_NM"] = prj_nm.title()
@@ -74,40 +76,40 @@ async def get_projects(source):
         record["PRJ_LDR"] = prj_ldr.title()
 
     count_sql = "select count() as N from fn011" + where
-    count = await run_query(source, count_sql, True)
+    count =  run_query(source, count_sql, True)
 
     return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<source>/project_filters/")
-async def get_project_list_filters(source):
+def get_project_list_filters(source):
     """"""
 
     # Fisheries assessment Office
     sql = """select distinct substr(prj_cd,1,3) as value from fn011
     where prj_cd is not null and prj_cd <>'';"""
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     fof = [x["value"] for x in rs]
     fof.sort()
 
     # project types
     sql = """select distinct substr(prj_cd,5,2) as value from fn011
     where prj_cd is not null and prj_cd <>'';"""
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     ptypes = [x["value"] for x in rs]
     ptypes.sort()
 
     # year
     sql = """select distinct substr(prj_cd,7,2) as value from fn011
     where prj_cd is not null and prj_cd <>'';"""
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     years = [x["value"] for x in rs]
     years.sort()
 
     # -- project suffix
     sql = """select distinct substr(prj_cd,10,3) as value from fn011
     where prj_cd is not null and prj_cd <>'';"""
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     suffixes = [x["value"] for x in rs]
     suffixes.sort()
 
@@ -115,7 +117,7 @@ async def get_project_list_filters(source):
 
 
 @api.route("/api/<source>/<prj_cd>/fn121/")
-async def get_fn121(source, prj_cd):
+def get_fn121(source, prj_cd):
     """"""
 
     PAGE_SIZE = 100
@@ -133,16 +135,16 @@ async def get_fn121(source, prj_cd):
 
     sql = sql + where + f" order by prj_cd, sam limit {limit} offset {offset};"
 
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
 
     count_sql = f"select count() as N from fn121 where prj_cd='{prj_cd}'" + where
-    count = await run_query(source, count_sql, True)
+    count =  run_query(source, count_sql, True)
 
     return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<source>/<prj_cd>/fn123/")
-async def get_fn123(source, prj_cd):
+def get_fn123(source, prj_cd):
     """"""
 
     PAGE_SIZE = 100
@@ -160,16 +162,16 @@ async def get_fn123(source, prj_cd):
 
     sql = sql + where + f" order by sam, eff, grp, spc limit {limit} offset {offset};"
 
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
 
     count_sql = f"select count() as N from fn123 where prj_cd='{prj_cd}'" + where
-    count = await run_query(source, count_sql, True)
+    count =  run_query(source, count_sql, True)
 
     return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<source>/<prj_cd>/fn125/")
-async def get_fn125(source, prj_cd):
+def get_fn125(source, prj_cd):
     """"""
 
     PAGE_SIZE = 200
@@ -191,24 +193,24 @@ async def get_fn125(source, prj_cd):
         + f" order by prj_cd, sam, eff, grp, spc, fish limit {limit} offset {offset};"
     )
 
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
 
     count_sql = f"select count() as N from fn125 where prj_cd='{prj_cd}'" + where
-    count = await run_query(source, count_sql, True)
+    count =  run_query(source, count_sql, True)
 
     return {"count": count["N"], "data": rs}
 
 
 @api.route("/api/<source>/<prj_cd>/<table>/choices/")
-async def get_table_choices(source, prj_cd, table):
+def get_table_choices(source, prj_cd, table):
     """Get the distinct strata values, samples, efforts. groups, and
     species in a project so they can be used to filter the table."""
 
     if table == "fn121":
         choices = {}
     else:
-        choices = await get_sam_eff_spc_grps(source, prj_cd, table)
-    strata = await get_project_strata(source, prj_cd, table)
+        choices =  get_sam_eff_spc_grps(source, prj_cd, table)
+    strata =  get_project_strata(source, prj_cd, table)
 
     choices.update(strata)
 
@@ -216,56 +218,56 @@ async def get_table_choices(source, prj_cd, table):
 
 
 @api.route("/api/<source>/project_detail/<prj_cd>/")
-async def get_project_detail(source, prj_cd):
+def get_project_detail(source, prj_cd):
     """"""
 
     sql = f"""select distinct prj_cd, prj_nm, prj_date0, prj_date1, prj_ldr,
     COMMENT0  from fn011 where prj_cd = '{prj_cd}';"""
-    fn011 = await run_query(source, sql, True)
+    fn011 =  run_query(source, sql, True)
 
     sql = f"""select distinct prj_cd, spc, spc_nm, grp, grp_des, spcmrk,
     sizsam, sizatt, sizint, biosam, agedec, fdsam from fn012 where
     prj_cd = '{prj_cd}' order by spc, grp;"""
-    fn012 = await run_query(source, sql)
+    fn012 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, ssn, ssn_date0, ssn_date1, ssn_des
     from fn022 where prj_cd = '{prj_cd}' order by prj_cd, ssn;"""
-    fn022 = await run_query(source, sql)
+    fn022 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, dtp, DTP_NM, DOW_LST
     from fn023 where prj_cd = '{prj_cd}' order by prj_cd, dtp;"""
-    fn023 = await run_query(source, sql)
+    fn023 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, dtp, prd, prdtm0, PRDTM1, PRD_DUR, TIME_WT
     from fn024 where prj_cd = '{prj_cd}' order by prj_cd, dtp, prd;"""
-    fn024 = await run_query(source, sql)
+    fn024 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, date, dtp1 from fn025
     where prj_cd = '{prj_cd}' order by prj_cd, date;"""
-    fn025 = await run_query(source, sql)
+    fn025 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, space, space_des, SPACE_SIZ, SPACE_WT,
     AREA_LST, AREA_CNT, AREA_WT from fn026 where prj_cd = '{prj_cd}'
     order by prj_cd, space;"""
 
-    fn026 = await run_query(source, sql)
+    fn026 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, mode, mode_des, gr, grtp, gruse, orient,
     atyunit, itvunit, chkflag from fn028 where prj_cd = '{prj_cd}'
     order by prj_cd, mode;"""
 
-    fn028 = await run_query(source, sql)
+    fn028 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, gr, gr_des, effcnt, effdst from
     fn013 where prj_cd ='{prj_cd}' order by prj_cd, gr;"""
 
-    fn013 = await run_query(source, sql)
+    fn013 =  run_query(source, sql)
 
     sql = f"""select distinct prj_cd, gr, eff, eff_des, mesh, grlen, grht,
     grwid, grcol, grmat, gryarn, grknot  from fn014 where
     prj_cd='{prj_cd}' order by prj_cd, gr, eff;"""
 
-    fn014 = await run_query(source, sql)
+    fn014 =  run_query(source, sql)
 
     return {
         "fn011": fn011,
@@ -285,17 +287,17 @@ async def get_project_detail(source, prj_cd):
 
 
 @api.route("/api/<source>/tables")
-async def get_database_tables(source):
+def get_database_tables(source):
     """"""
 
     sql = "SELECT name FROM sqlite_master WHERE type='table' order by name;"
-    rs = await run_query(source, sql)
+    rs =  run_query(source, sql)
     tables = [x["name"] for x in rs]
     return {"tables": tables}
 
 
 @api.route("/api/<source>/<table_name>/fields")
-async def get_table_fields(source, table_name):
+def get_table_fields(source, table_name):
     """Given a table, return all of the fields.  if any of the FN
     Keyfields are in the table, return them first in the correct order and
     then return all of the others.
@@ -304,7 +306,7 @@ async def get_table_fields(source, table_name):
     # sql = "SELECT * FROM {} limit 1;".format(table_name)
     # data = run_query(source, sql)
     # fields = list(data[0].keys())
-    fields = await get_field_names(source, table_name)
+    fields =  get_field_names(source, table_name)
 
     sortedFields = sort_fields(fields, FN_KEYFIELDS)
 
@@ -312,7 +314,7 @@ async def get_table_fields(source, table_name):
 
 
 @api.route("/api/distinct/<source>/<table_name>/<field_name>/")
-async def distinct_values(source, table_name, field_name):
+def distinct_values(source, table_name, field_name):
     """our front end will call this endpoint, with the current filters to
     see if this field has any data, returns true if it does, returns
     false if it is always empty give the table fitlered attributes
@@ -325,7 +327,7 @@ async def distinct_values(source, table_name, field_name):
 
     filters = request.args
 
-    field_names = await get_field_names(source, table_name)
+    field_names =  get_field_names(source, table_name)
     # pop of this field name from the filters - we all values of this field
     # given the filters applied to every other field
     field_names = [x for x in field_names if x != field_name]
@@ -342,12 +344,12 @@ async def distinct_values(source, table_name, field_name):
     )
 
     # return true if there is a record,
-    data = await run_query(source, sql)
+    data =  run_query(source, sql)
     return {"values": list(data)}
 
 
 @api.route("/api/<source>/<table_name>/record_count/")
-async def record_count(source, table_name):
+def record_count(source, table_name):
     """our front end will call this endpoint, with the current filters to
     see if this field has any data, returns true if it does, returns
     false if it is always empty give the table filtered attributes
@@ -360,7 +362,7 @@ async def record_count(source, table_name):
 
     filters = request.args
 
-    field_names = await get_field_names(source, table_name)
+    field_names =  get_field_names(source, table_name)
 
     sql = "SELECT count(*) as records FROM [{}] ".format(table_name)
     # tack filters onto sql here:
@@ -372,12 +374,12 @@ async def record_count(source, table_name):
         where = ""
 
     # return true if there is a record,
-    data = await run_query(source, sql + where)
+    data =  run_query(source, sql + where)
     return {"values": list(data)}
 
 
 @api.route("/api/field_stats/<source>/<table_name>/<field_name>/")
-async def field_stats(source, table_name, field_name):
+def field_stats(source, table_name, field_name):
     """this endpoint will return a number of statistics about how a field has
     been used in a table:  How many times it is populated, coount null records
     by project code, how many disctinct values it has and the top 200 use cases.
@@ -393,7 +395,7 @@ async def field_stats(source, table_name, field_name):
             and [{field_name}] is not ' '
             and [{field_name}] is not '';"""
     try:
-        occurrence_count = await run_query(source, sql)
+        occurrence_count =  run_query(source, sql)
     except:  # sqlite3.OperationalError:
         occurrence_count = [
             f"Field '{field_name}' not found in '{table_name}'",
@@ -407,7 +409,7 @@ async def field_stats(source, table_name, field_name):
     );"""
 
     try:
-        distinct_vals = await run_query(source, sql)
+        distinct_vals =  run_query(source, sql)
     except:  # sqlite3.OperationalError:
         distinct_vals = [
             f"Field '{field_name}' not found in '{table_name}'",
@@ -421,7 +423,7 @@ async def field_stats(source, table_name, field_name):
     );"""
 
     try:
-        prj_cds = await run_query(source, sql)
+        prj_cds =  run_query(source, sql)
     except:  # sqlite3.OperationalError:
         prj_cds = [
             f"Field '{field_name}' not found in '{table_name}'",
@@ -435,7 +437,7 @@ async def field_stats(source, table_name, field_name):
             order by count([PRJ_CD]) desc;"""
 
     try:
-        project_counts = await run_query(source, sql)
+        project_counts =  run_query(source, sql)
     except:  # sqlite3.OperationalError:
         project_counts = [
             f"Field '{field_name}' not found in '{table_name}'",
@@ -449,7 +451,7 @@ async def field_stats(source, table_name, field_name):
             order by count([{field_name}]) desc limit 100;"""
 
     try:
-        common_values = await run_query(source, sql)
+        common_values =  run_query(source, sql)
     except:  # sqlite3.OperationalError:
         common_values = [
             f"Field '{field_name}' not found in '{table_name}'",
@@ -465,7 +467,7 @@ async def field_stats(source, table_name, field_name):
 
 
 @api.route("/api/field_finder/")
-async def field_finder():
+def field_finder():
     """"""
 
     filters = request.args
@@ -497,9 +499,9 @@ async def field_finder():
 
     sql = select_sql + fld_sql + table_sql + src_sql + limit
 
-    rs = await run_query("FF", sql)
+    rs =  run_query("FF", sql)
 
     return {"data": rs}
 
 
-api.run()
+#api.run()
