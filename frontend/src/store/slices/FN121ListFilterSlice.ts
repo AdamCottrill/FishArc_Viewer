@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, current } from "@reduxjs/toolkit";
 
 //import { isArray } from "../utils";
 
-//import { FN121ListFilter } from "../../interfaces";
+import { FN121ListFilter } from "../../interfaces";
 
 const initialState: FN121ListFilter = {};
 
@@ -11,15 +11,17 @@ export const FN121ListFilterSlice = createSlice({
   initialState,
   reducers: {
     update: (state, action: PayloadAction<{}>) => {
+      const [key, value] = Object.entries(action.payload)[0];
       const new_state = { ...state, ...action.payload };
-      return Object.fromEntries(
-        Object.entries(new_state).filter(([key, value]) => value !== "")
-      );
+      if (value === "") {
+        delete new_state[key];
+      }
+      return new_state;
     },
 
     append: (state, action: PayloadAction<{}>) => {
       const [key, value] = Object.entries(action.payload)[0];
-      let current = { ...state }?.[key] || [];
+      let current: any = { ...state }?.[key] || [];
       current = [...new Set([...current, value])];
       return { ...state, [key]: current };
     },
@@ -28,11 +30,12 @@ export const FN121ListFilterSlice = createSlice({
       const [key, value] = Object.entries(action.payload)[0];
 
       const new_state = { ...state };
+      const values = new_state[key];
 
-      if (new_state[key]?.filter) {
-        new_state[key] = new_state[key].filter((val) => val !== value);
-      } else {
+      if (typeof values === "string") {
         delete new_state[key];
+      } else {
+        new_state[key] = values.filter((val) => val !== value);
       }
 
       return new_state;

@@ -38,7 +38,7 @@ export function FN011List() {
 
   // update the url query search parameters each time the filters change
   useEffect(() => {
-    setSearch(filters);
+    setSearch({ ...filters });
   }, [filters]);
 
   /* Pagination*/

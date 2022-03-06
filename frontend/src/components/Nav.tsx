@@ -15,7 +15,7 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { useAppSelector } from "../store/hooks";
 
 export default function Nav() {
-  const { colormode, toggleColorMode } = useColorMode();
+  const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue("white", "gray.800");
 
   const source = useAppSelector((state) => state.DataSource);
@@ -34,7 +34,7 @@ export default function Nav() {
         variant="ghost"
         aria-label="toggle-color-theme"
         onClick={() => toggleColorMode()}
-        icon={colormode === "light" ? <MoonIcon /> : <SunIcon />}
+        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
       />
     </Flex>
   );

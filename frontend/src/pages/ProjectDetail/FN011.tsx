@@ -13,7 +13,7 @@ import {
 
 import { Link as RouterLink } from "react-router-dom";
 
-export const FN011 = ({ source, project }): FC => (
+export const FN011 = ({ source, project }): JSX.Element => (
   <Container p={8} borderWidth="1px" borderRadius="lg" maxW="container.xl">
     <Heading py={6}>
       {project.PRJ_NM} ({project.PRJ_CD})

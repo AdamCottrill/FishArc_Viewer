@@ -32,4 +32,4 @@ const ProjectTypeRadios = (props) => {
   );
 };
 
-export default SideBarProjectType;
+export default ProjectTypeRadios;

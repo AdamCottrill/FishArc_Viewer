@@ -1,9 +1,5 @@
 # import sqlite3
-
-from flask import Flask, request
-#from quart import Quart, request, send_from_directory
-
-
+from flask import Flask, request, send_from_directory
 
 from .utils import (
     build_sql_filter,
@@ -22,12 +18,6 @@ api.config["JSON_SORT_KEYS"] = False
 
 ROW_LIMIT = 200
 FN_KEYFIELDS = ["PRJ_CD", "SAM", "EFF", "SPC", "GRP", "FISH", "AGEID"]
-
-# @api.route("/")
-# def react_app():
-#     """Return the template that will render our react app"""
-#     print(api.static_folder)
-#     return send_from_directory(api.static_folder, "index.html")
 
 
 @api.route("/")
@@ -488,8 +478,8 @@ def field_finder():
     else:
         table_sql = ""
 
-    if "src" in filters:
-        src = filters["src"]
+    if "projectType" in filters:
+        src = filters["projectType"]
         sources = ", ".join([f"'{x}'" for x in src.split(",")])
         src_sql = f" and src in ({sources}) "
     else:

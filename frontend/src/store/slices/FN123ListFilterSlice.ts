@@ -2,9 +2,9 @@ import { createSlice, PayloadAction, current } from "@reduxjs/toolkit";
 
 //import { isArray } from "../utils";
 
-//import { FN123ListFilter } from "../../interfaces";
+//import { FN123FN125ListFilter } from "../../interfaces";
 
-const initialState: FN123ListFilter = {};
+const initialState = {};
 
 export const FN123ListFilterSlice = createSlice({
   name: "FN123List-filter",
@@ -19,7 +19,7 @@ export const FN123ListFilterSlice = createSlice({
 
     append: (state, action: PayloadAction<{}>) => {
       const [key, value] = Object.entries(action.payload)[0];
-      let current = { ...state }?.[key] || [];
+        let current:any = { ...state }?.[key] || [];
       current = [...new Set([...current, value])];
       return { ...state, [key]: current };
     },

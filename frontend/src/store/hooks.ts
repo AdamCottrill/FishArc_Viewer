@@ -11,7 +11,7 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
 // a custom hook that exends browser-router hook to get and set search parameters
 export const useCustomSearchParams = () => {
-  const [search, setSearch] = useSearchParams();
-  const searchAsObject = queryString.parse(search.toString());
-  return [searchAsObject, setSearch];
+  const [searchParams, setSearchParams] = useSearchParams()
+    const searchAsObject:{} = queryString.parse(searchParams.toString());
+  return [searchAsObject, setSearchParams] as const;
 };

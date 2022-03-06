@@ -1,18 +1,16 @@
-import {FilterInterface, filterType } from "./interfaces"
+import { FilterInterface, filterType } from "./interfaces";
 
-const isArray = (x: any): boolean => {
+const isArray = (x: filterType): boolean => {
   return Object.prototype.toString.call(x) === "[object Array]" ? true : false;
 };
 
+export const flattenFilters = (filters: FilterInterface): string[][] => {
+  let filterList: string[][] = [];
 
+  //type ValueType = string | string[];
 
-export const flattenFilters = (filters:FilterInterface):string[][] => {
-    let filterList:string[][] = [];
-
-    //type ValueType = string | string[];
-
-    Object.entries(filters).map(([key, value]):void => {
-    if (isArray(value)) {
+  Object.entries(filters).map(([key, value]): void => {
+      if (typeof(value)==='object') {
       value.map((x: string) => filterList.push([key, x]));
     } else {
       filterList.push([key, value]);
@@ -20,8 +18,6 @@ export const flattenFilters = (filters:FilterInterface):string[][] => {
   });
   return filterList;
 };
-
-
 
 /**
  * A little wrapper function around .includes() - returns true if
@@ -43,7 +39,6 @@ export const contains = (val: string, filter: string): boolean => {
   }
 };
 
-
 // used by sidebar filters to add a value to state
 export const addFilter = (values, setValues, key, value) => {
   let current = { ...values }?.[key] || [];
@@ -61,7 +56,6 @@ export const popFilter = (values, setValues, key, value) => {
   }
   setValues({ ...current });
 };
-
 
 export const projectTypes = [
   ["CFCD", "Catch Sampling"],

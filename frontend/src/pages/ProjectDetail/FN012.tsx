@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import SortableTable from "../../components/SortableTable";
 
-export const FN012 = ({ data }): FC => {
+export const FN012 = ({ data }): JSX.Element => {
   const columns = useMemo(
     () => [
       {

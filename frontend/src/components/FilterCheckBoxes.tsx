@@ -3,16 +3,27 @@ import { CheckBoxGroup } from "./CheckBoxGroup";
 import { Spinner } from "./Spinner";
 import { BoxedAlert } from "./BoxedAlert";
 
+type FilterCheckBoxesInterface = {
+  name: string;
+  items: any;
+  status: "idle" | "error" | "loading" | "success";
+  filters: any;
+  handleChange: any;
+  showFilterInput?: boolean;
+  alertTitle?: string;
+  alertDescription?: string;
+};
+
 export const FilterCheckBoxes = ({
   name,
   items,
   status,
   filters,
   handleChange,
+  showFilterInput,
   alertTitle,
   alertDescription,
-  showFilterInput,
-}) => {
+}: FilterCheckBoxesInterface) => {
   if (status === "loading") {
     return <Spinner />;
   }

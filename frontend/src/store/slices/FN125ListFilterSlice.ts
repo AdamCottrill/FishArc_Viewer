@@ -2,9 +2,9 @@ import { createSlice, PayloadAction, current } from "@reduxjs/toolkit";
 
 //import { isArray } from "../utils";
 
-import { FN125ListFilter } from "../../interfaces";
+//import { FN123FN125ListFilter } from "../../interfaces";
 
-const initialState: FN125ListFilter = {};
+const initialState = {};
 
 export const FN125ListFilterSlice = createSlice({
   name: "FN125List-filter",

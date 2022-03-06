@@ -26,6 +26,12 @@ import { FetchFieldStats } from "./FetchFieldStats";
 import { CheckBoxGroup } from "../../components/CheckBoxGroup";
 import { projectTypes } from "../../utils";
 
+interface FieldFinderFilterInterface {
+  projectType?: string[];
+  tablename?: string;
+  fieldname?: string;
+}
+
 export function FieldFinder() {
   //const spinnerMessage = `Fetching Data for "${field}" from the ${table} table`;
 
@@ -35,24 +41,49 @@ export function FieldFinder() {
     return { value, label };
   });
 
-  console.log(projTypes);
-
   let [searchAsObject, setSearch] = useCustomSearchParams();
 
-  const [filters, setFilters] = useState({ ...searchAsObject });
+  const [myfilters, setFilters] = useState<FieldFinderFilterInterface>({
+    ...searchAsObject,
+  });
 
-  const { data, error } = useQuery(["found-fields", filters], () =>
-    getFoundFields(filters)
+  const { data, error } = useQuery(["found-fields", myfilters], () =>
+    getFoundFields(myfilters)
   );
 
   if (error) {
     return <BoxedAlert />;
   }
 
-  // update the url query search parameters each time the filters change
+  // update the url query search parameters each time the myfilters change
   useEffect(() => {
-    setSearch(filters);
-  }, [filters]);
+    setSearch({ ...myfilters });
+  }, [myfilters]);
+
+  const handleCheckBoxChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const { value } = event.currentTarget;
+    let checked = myfilters.hasOwnProperty("projectType")
+      ? myfilters["projectType"]
+      : [];
+
+    if (checked.includes(value)) {
+      // remove it from myfilters
+      checked = checked.filter((x: string) => x != value);
+      if (checked.length) {
+        setFilters({ ...myfilters, projectType: checked });
+      } else {
+        // if there are no more project types selected, remove the project type key
+        const updated = { ...myfilters };
+        delete updated.projectType;
+        setFilters({ ...updated });
+      }
+    } else {
+      // add it to myfilters
+      setFilters({ ...myfilters, projectType: [...checked, value] });
+    }
+  };
 
   return (
     <VStack align="top" spacing="30px" flex="1">
@@ -81,8 +112,12 @@ export function FieldFinder() {
             <CheckBoxGroup
               name="project-types"
               values={projTypes}
-              checked={filters?.projectType || []}
-              handleCheck={(e) => console.log(e)}
+              checked={
+                myfilters.hasOwnProperty("projectType")
+                  ? myfilters["projectType"]
+                  : []
+              }
+              handleCheck={handleCheckBoxChange}
             />
           </VStack>
         </Box>
@@ -96,9 +131,13 @@ export function FieldFinder() {
               margin={1}
               rounded="full"
               placeholder={"Table name like..."}
-              value={filters?.tablename ? filters.tablename : ""}
+              value={
+                myfilters.hasOwnProperty("tablename")
+                  ? myfilters["tablename"]
+                  : ""
+              }
               onChange={(e) =>
-                setFilters({ ...filters, tablename: e.currentTarget.value })
+                setFilters({ ...myfilters, tablename: e.currentTarget.value })
               }
             />
             <Spacer />
@@ -109,9 +148,13 @@ export function FieldFinder() {
               margin={1}
               rounded="full"
               placeholder={"Field name like..."}
-              value={filters?.fieldname ? filters.fieldname : ""}
+              value={
+                myfilters.hasOwnProperty("fieldname")
+                  ? myfilters["fieldname"]
+                  : ""
+              }
               onChange={(e) =>
-                setFilters({ ...filters, fieldname: e.currentTarget.value })
+                setFilters({ ...myfilters, fieldname: e.currentTarget.value })
               }
             />
             <Spacer />
