@@ -91,7 +91,7 @@ export const FN121: FC = () => {
       },
 
       {
-        Header: "EFFTDUR",
+        Header: "EFFDUR",
         accessor: "EFFDUR",
       },
 

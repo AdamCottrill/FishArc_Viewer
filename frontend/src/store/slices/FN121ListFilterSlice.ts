@@ -4,20 +4,28 @@ import { createSlice, PayloadAction, current } from "@reduxjs/toolkit";
 
 import { FN121ListFilter } from "../../interfaces";
 
+
 const initialState: FN121ListFilter = {};
 
 export const FN121ListFilterSlice = createSlice({
   name: "FN121List-filter",
   initialState,
   reducers: {
-    update: (state, action: PayloadAction<{}>) => {
-      const [key, value] = Object.entries(action.payload)[0];
+
+      update: (state, action: PayloadAction<{}>) => {
       const new_state = { ...state, ...action.payload };
-      if (value === "") {
-        delete new_state[key];
+      const item = Object.entries(action.payload);
+      if (item.hasOwnProperty("length")) {
+        if (item.length === 1) {
+          const [key, value] = item[0];
+          if (value === "") {
+            delete new_state[key];
+          }
+        }
       }
       return new_state;
     },
+
 
     append: (state, action: PayloadAction<{}>) => {
       const [key, value] = Object.entries(action.payload)[0];

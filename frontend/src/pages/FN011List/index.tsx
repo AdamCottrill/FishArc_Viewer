@@ -20,8 +20,6 @@ import { TableControls } from "../../components/TableControls";
 
 import { FN011Sidebar } from "./FN011Sidebar";
 
-//import { FilterDrawer } from "../components/FilterDrawer";
-
 export function FN011List() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
