@@ -1,8 +1,6 @@
-import { createSlice, PayloadAction, current } from "@reduxjs/toolkit";
+import { createSlice  } from "@reduxjs/toolkit";
 
-//import { isArray } from "../utils";
-
-//import { FN123FN125ListFilter } from "../../interfaces";
+import { update_filter, append_filter, remove_filter } from "./filter_reducers";
 
 const initialState = {};
 
@@ -10,33 +8,9 @@ export const FN123ListFilterSlice = createSlice({
   name: "FN123List-filter",
   initialState,
   reducers: {
-    update: (state, action: PayloadAction<{}>) => {
-      const new_state = { ...state, ...action.payload };
-      return Object.fromEntries(
-        Object.entries(new_state).filter(([key, value]) => value !== "")
-      );
-    },
-
-    append: (state, action: PayloadAction<{}>) => {
-      const [key, value] = Object.entries(action.payload)[0];
-        let current:any = { ...state }?.[key] || [];
-      current = [...new Set([...current, value])];
-      return { ...state, [key]: current };
-    },
-
-    remove: (state, action: PayloadAction<{}>) => {
-      const [key, value] = Object.entries(action.payload)[0];
-
-      const new_state = { ...state };
-
-      if (new_state[key]?.filter) {
-        new_state[key] = new_state[key].filter((val) => val !== value);
-      } else {
-        delete new_state[key];
-      }
-
-      return new_state;
-    },
+    update: update_filter,
+    append: append_filter,
+    remove: remove_filter,
   },
 });
 
