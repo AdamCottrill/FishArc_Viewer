@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    base:"/fish_arc_viewer/",
     plugins: [react()],
     optimizeDeps: {
     include: ["@emotion/react"],

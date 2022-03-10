@@ -20,6 +20,8 @@ import { FieldFinder } from "./pages/FieldFinder";
 
 const queryClient = new QueryClient();
 
+const base_url = import.meta.env.BASE_URL;
+
 function App() {
   return (
     <div className="App">
@@ -30,25 +32,43 @@ function App() {
             <BrowserRouter>
               <Nav />
               <Routes>
-                <Route path=":source/" element={<FN011List />}></Route>
                 <Route
-                  path=":source/project_detail/:prj_cd/"
+                  path={`${base_url}:source/`}
+                  element={<FN011List />}
+                ></Route>
+                <Route
+                  path={`${base_url}:source/project_detail/:prj_cd/`}
                   element={<ProjectDetail />}
                 />
-                <Route path=":source/samples/:prj_cd/" element={<FN121 />} />
                 <Route
-                  path=":source/catch_counts/:prj_cd/"
+                  path={`${base_url}:source/samples/:prj_cd/`}
+                  element={<FN121 />}
+                />
+                <Route
+                  path={`${base_url}:source/catch_counts/:prj_cd/`}
                   element={<FN123 />}
                 />
-                <Route path=":source/biosamples/:prj_cd/" element={<FN125 />} />
-
-                <Route path="field_stats/" element={<FieldStats />} />
-                <Route path="field_finder/" element={<FieldFinder />} />
-
-                <Route path="/" element={<Navigate to="glarc/" />} />
+                <Route
+                  path={`${base_url}:source/biosamples/:prj_cd/`}
+                  element={<FN125 />}
+                />
 
                 <Route
-                  path="*"
+                  path={`${base_url}field_stats/`}
+                  element={<FieldStats />}
+                />
+                <Route
+                  path={`${base_url}field_finder/`}
+                  element={<FieldFinder />}
+                />
+
+                <Route
+                  path={`${base_url}`}
+                  element={<Navigate to="glarc/" />}
+                />
+
+                <Route
+                  path={`${base_url}*`}
                   element={
                     <main style={{ padding: "1rem" }}>
                       <p>There's nothing here!</p>

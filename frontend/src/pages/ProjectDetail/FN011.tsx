@@ -13,6 +13,8 @@ import {
 
 import { Link as RouterLink } from "react-router-dom";
 
+const base_url = import.meta.env.BASE_URL;
+
 export const FN011 = ({ source, project }): JSX.Element => (
   <Container p={8} borderWidth="1px" borderRadius="lg" maxW="container.xl">
     <Heading py={6}>
@@ -37,20 +39,26 @@ export const FN011 = ({ source, project }): JSX.Element => (
         </Text>
         <Spacer />
         <HStack spacing={8} py={4}>
-          <Link as={RouterLink} to={`/${source}/samples/${project.PRJ_CD}`}>
+          <Link
+            as={RouterLink}
+            to={`${base_url}${source}/samples/${project.PRJ_CD}`}
+          >
             <Button size="sm" colorScheme="teal" rounded="full">
               Samples
             </Button>
           </Link>
           <Link
             as={RouterLink}
-            to={`/${source}/catch_counts/${project.PRJ_CD}`}
+            to={`${base_url}${source}/catch_counts/${project.PRJ_CD}`}
           >
             <Button size="sm" colorScheme="green" rounded="full">
               Catch Counts
             </Button>
           </Link>
-          <Link as={RouterLink} to={`/${source}/biosamples/${project.PRJ_CD}`}>
+          <Link
+            as={RouterLink}
+            to={`${base_url}${source}/biosamples/${project.PRJ_CD}`}
+          >
             <Button size="sm" colorScheme="blue" rounded="full">
               Bio-Samples
             </Button>

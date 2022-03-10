@@ -9,7 +9,7 @@ if (!import.meta.env.MODE || import.meta.env.MODE === "development") {
   });
 } else {
   api = axios.create({
-    baseURL: "/api",
+    baseURL: "127.0.0.1:5000/api",
   });
 }
 

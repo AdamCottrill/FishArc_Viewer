@@ -20,7 +20,7 @@ ROW_LIMIT = 200
 FN_KEYFIELDS = ["PRJ_CD", "SAM", "EFF", "SPC", "GRP", "FISH", "AGEID"]
 
 
-@api.route("/")
+@api.route("/fn_arc_viewer/")
 def react_app():
     """Return the template that will render our react app"""
     return send_from_directory(api.static_folder, "index.html")

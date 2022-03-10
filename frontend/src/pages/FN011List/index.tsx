@@ -20,6 +20,8 @@ import { TableControls } from "../../components/TableControls";
 
 import { FN011Sidebar } from "./FN011Sidebar";
 
+const base_url = import.meta.env.BASE_URL;
+
 export function FN011List() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
@@ -71,7 +73,7 @@ export function FN011List() {
             <Link
               as={RouterLink}
               color="blue"
-              to={{ pathname: `/${source}/project_detail/${PRJ_CD}` }}
+              to={{ pathname: `${base_url}${source}/project_detail/${PRJ_CD}` }}
             >
               {PRJ_CD}
             </Link>

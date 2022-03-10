@@ -18,6 +18,8 @@ import { update, remove } from "../../store/slices/FN121ListFilterSlice";
 
 import { FN121Sidebar } from "./FN121Sidebar";
 
+const base_url = import.meta.env.BASE_URL;
+
 export const FN121: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
@@ -161,7 +163,7 @@ export const FN121: FC = () => {
         <Link
           color="teal.500"
           as={RouterLink}
-          to={`/${source}/project_detail/${prj_cd}`}
+          to={`${base_url}${source}/project_detail/${prj_cd}`}
         >
           {prj_cd}
         </Link>{" "}

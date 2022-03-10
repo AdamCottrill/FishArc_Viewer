@@ -13,6 +13,8 @@ import {
   Td,
 } from "@chakra-ui/react";
 
+const base_url = import.meta.env.BASE_URL;
+
 export default function ShowFieldStats(props) {
   const { data, field, table } = props;
 
@@ -66,7 +68,7 @@ export default function ShowFieldStats(props) {
                         <Link
                           color="teal.500"
                           as={RouterLink}
-                          to={`/glarc/project_detail/${project.PRJ_CD}`}
+                          to={`${base_url}glarc/project_detail/${project.PRJ_CD}`}
                         >
                           {project.PRJ_CD}
                         </Link>
