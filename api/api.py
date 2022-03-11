@@ -13,20 +13,20 @@ from .utils import (
     sort_fields,
 )
 
-api = Flask(__name__, static_folder="build", static_url_path="/")
+api = Flask(__name__, static_folder="build", static_url_path="/fish_arc_viewer")
 api.config["JSON_SORT_KEYS"] = False
 
 ROW_LIMIT = 200
 FN_KEYFIELDS = ["PRJ_CD", "SAM", "EFF", "SPC", "GRP", "FISH", "AGEID"]
 
 
-@api.route("/fn_arc_viewer/")
+@api.route("/fish_arc_viewer/")
 def react_app():
     """Return the template that will render our react app"""
     return send_from_directory(api.static_folder, "index.html")
 
 
-@api.route("/api/<source>/projects/")
+@api.route("/fish_arc_api/<source>/projects/")
 def get_projects(source):
     """"""
 
@@ -71,7 +71,7 @@ def get_projects(source):
     return {"count": count["N"], "data": rs}
 
 
-@api.route("/api/<source>/project_filters/")
+@api.route("/fish_arc_api/<source>/project_filters/")
 def get_project_list_filters(source):
     """"""
 
@@ -106,7 +106,7 @@ def get_project_list_filters(source):
     return {"fof": fof, "project_types": ptypes, "suffixes": suffixes, "years": years}
 
 
-@api.route("/api/<source>/<prj_cd>/fn121/")
+@api.route("/fish_arc_api/<source>/<prj_cd>/fn121/")
 def get_fn121(source, prj_cd):
     """"""
 
@@ -133,7 +133,7 @@ def get_fn121(source, prj_cd):
     return {"count": count["N"], "data": rs}
 
 
-@api.route("/api/<source>/<prj_cd>/fn123/")
+@api.route("/fish_arc_api/<source>/<prj_cd>/fn123/")
 def get_fn123(source, prj_cd):
     """"""
 
@@ -160,7 +160,7 @@ def get_fn123(source, prj_cd):
     return {"count": count["N"], "data": rs}
 
 
-@api.route("/api/<source>/<prj_cd>/fn125/")
+@api.route("/fish_arc_api/<source>/<prj_cd>/fn125/")
 def get_fn125(source, prj_cd):
     """"""
 
@@ -191,7 +191,7 @@ def get_fn125(source, prj_cd):
     return {"count": count["N"], "data": rs}
 
 
-@api.route("/api/<source>/<prj_cd>/<table>/choices/")
+@api.route("/fish_arc_api/<source>/<prj_cd>/<table>/choices/")
 def get_table_choices(source, prj_cd, table):
     """Get the distinct strata values, samples, efforts. groups, and
     species in a project so they can be used to filter the table."""
@@ -207,7 +207,7 @@ def get_table_choices(source, prj_cd, table):
     return choices
 
 
-@api.route("/api/<source>/project_detail/<prj_cd>/")
+@api.route("/fish_arc_api/<source>/project_detail/<prj_cd>/")
 def get_project_detail(source, prj_cd):
     """"""
 
@@ -276,7 +276,7 @@ def get_project_detail(source, prj_cd):
 # ============================================
 
 
-@api.route("/api/<source>/tables")
+@api.route("/fish_arc_api/<source>/tables")
 def get_database_tables(source):
     """"""
 
@@ -286,7 +286,7 @@ def get_database_tables(source):
     return {"tables": tables}
 
 
-@api.route("/api/<source>/<table_name>/fields")
+@api.route("/fish_arc_api/<source>/<table_name>/fields")
 def get_table_fields(source, table_name):
     """Given a table, return all of the fields.  if any of the FN
     Keyfields are in the table, return them first in the correct order and
@@ -303,7 +303,7 @@ def get_table_fields(source, table_name):
     return {"fields": sortedFields}
 
 
-@api.route("/api/distinct/<source>/<table_name>/<field_name>/")
+@api.route("/fish_arc_api/distinct/<source>/<table_name>/<field_name>/")
 def distinct_values(source, table_name, field_name):
     """our front end will call this endpoint, with the current filters to
     see if this field has any data, returns true if it does, returns
@@ -338,7 +338,7 @@ def distinct_values(source, table_name, field_name):
     return {"values": list(data)}
 
 
-@api.route("/api/<source>/<table_name>/record_count/")
+@api.route("/fish_arc_api/<source>/<table_name>/record_count/")
 def record_count(source, table_name):
     """our front end will call this endpoint, with the current filters to
     see if this field has any data, returns true if it does, returns
@@ -368,7 +368,7 @@ def record_count(source, table_name):
     return {"values": list(data)}
 
 
-@api.route("/api/field_stats/<source>/<table_name>/<field_name>/")
+@api.route("/fish_arc_api/field_stats/<source>/<table_name>/<field_name>/")
 def field_stats(source, table_name, field_name):
     """this endpoint will return a number of statistics about how a field has
     been used in a table:  How many times it is populated, coount null records
@@ -456,7 +456,7 @@ def field_stats(source, table_name, field_name):
     }
 
 
-@api.route("/api/field_finder/")
+@api.route("/fish_arc_api/field_finder/")
 def field_finder():
     """"""
 
