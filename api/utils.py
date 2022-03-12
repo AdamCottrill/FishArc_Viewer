@@ -1,11 +1,12 @@
 import os
 from typing import List
-#from databases import Database
+
+# from databases import Database
 from collections import OrderedDict
 import sqlite3
 
 # DB_DIR = "/home/adam/Documents/sandbox/"
-DB_DIR = "./db"
+DB_DIR = "./api/db"
 
 DB_SOURCES = {
     "fisharc": "fisharc.db",
@@ -29,7 +30,7 @@ def dict_factory(cursor, row):
     return d
 
 
-def run_query(source, sql,  fetchone=False):
+def run_query(source, sql, fetchone=False):
     """
     Arguments:
     - `sql`:
@@ -162,22 +163,22 @@ def get_where_sql(filters: dict, fields: List[str]) -> str:
 def get_sam_eff_spc_grps(source, prj_cd, table):
 
     sql = f"select distinct sam as value from {table} where prj_cd ='{prj_cd}';"
-    rs =  run_query(source, sql)
+    rs = run_query(source, sql)
     sams = [x["value"] for x in rs]
     sams.sort()
 
     sql = f"select distinct eff as value from {table} where prj_cd ='{prj_cd}';"
-    rs =  run_query(source, sql)
+    rs = run_query(source, sql)
     effs = [x["value"] for x in rs]
     effs.sort()
 
     sql = f"select distinct grp as value from {table} where prj_cd ='{prj_cd}';"
-    rs =  run_query(source, sql)
+    rs = run_query(source, sql)
     grps = [x["value"] for x in rs]
     grps.sort()
 
     sql = f"select distinct spc as value from {table} where prj_cd ='{prj_cd}';"
-    rs =  run_query(source, sql)
+    rs = run_query(source, sql)
     species = [x["value"] for x in rs]
     species.sort()
 
@@ -195,29 +196,29 @@ def get_project_strata(source, prj_cd, table):
 
     sql = f"""select distinct stratum
     from {table} where prj_cd = '{prj_cd}' order by stratum;"""
-    stratum =  run_query(source, sql)
+    stratum = run_query(source, sql)
 
     sql = f"""select distinct ssn, ssn_des
     from fn022 where prj_cd = '{prj_cd}' order by ssn;"""
-    fn022 =  run_query(source, sql)
+    fn022 = run_query(source, sql)
 
     sql = f"""select distinct dtp, DTP_NM
     from fn023 where prj_cd = '{prj_cd}' order by dtp;"""
-    fn023 =  run_query(source, sql)
+    fn023 = run_query(source, sql)
 
     sql = f"""select distinct dtp, prd, prdtm0, PRDTM1
     from fn024 where prj_cd = '{prj_cd}' order by dtp, prd;"""
-    fn024 =  run_query(source, sql)
+    fn024 = run_query(source, sql)
 
     sql = f"""select distinct space, space_des from
     fn026 where prj_cd = '{prj_cd}' order by space;"""
 
-    fn026 =  run_query(source, sql)
+    fn026 = run_query(source, sql)
 
     sql = f"""select distinct mode, mode_des from fn028 where
     prj_cd = '{prj_cd}' order by mode;"""
 
-    fn028 =  run_query(source, sql)
+    fn028 = run_query(source, sql)
 
     return {
         "stratum": stratum,
@@ -330,7 +331,7 @@ def get_field_names(
     # sql = "SELECT * FROM [{}]".format(table_name)
     sql = "PRAGMA table_info( [{}] );".format(table_name)
 
-    data =  run_query(project_type, sql)
+    data = run_query(project_type, sql)
     if data:
         return [x.get("name") for x in data]
     else:

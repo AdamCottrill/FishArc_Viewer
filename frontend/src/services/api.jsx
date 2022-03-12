@@ -9,7 +9,7 @@ if (!import.meta.env.MODE || import.meta.env.MODE === "development") {
   });
 } else {
   api = axios.create({
-    baseURL: "/fish_arc_api",
+    baseURL: "/fisharc_viewer/api",
   });
 }
 
