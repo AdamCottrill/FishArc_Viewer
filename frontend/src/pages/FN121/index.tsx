@@ -20,7 +20,7 @@ import { FN121Sidebar } from "./FN121Sidebar";
 
 const base_url = import.meta.env.BASE_URL;
 
-export const FN121: FC = () => {
+export default function FN121() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
   let [searchAsObject, setSearch] = useCustomSearchParams();
@@ -187,4 +187,4 @@ export const FN121: FC = () => {
       <FN121Sidebar isOpen={isOpen} onClose={onClose} />
     </Container>
   );
-};
+}

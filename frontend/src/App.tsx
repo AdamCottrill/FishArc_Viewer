@@ -10,15 +10,26 @@ import theme from "./theme";
 import Nav from "./components/Nav";
 import { store } from "./store/store";
 
-import { FN011List } from "./pages/FN011List";
-import { ProjectDetail } from "./pages/ProjectDetail";
-import { FN121 } from "./pages/FN121";
-import { FN123 } from "./pages/FN123";
-import { FN125 } from "./pages/FN125";
-import { FieldStats } from "./pages/FieldStats";
-import { FieldFinder } from "./pages/FieldFinder";
+import FN011List from "./pages/FN011List";
+import ProjectDetail from "./pages/ProjectDetail";
+import FN121 from "./pages/FN121";
+import FN123 from "./pages/FN123";
+import FN125 from "./pages/FN125";
+import FieldStats from "./pages/FieldStats";
+import FieldFinder from "./pages/FieldFinder";
 
-const queryClient = new QueryClient();
+const refetchInterval = 1000 * 60 * 60 * 24;
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: refetchInterval,
+    },
+  },
+});
 
 const base_url = import.meta.env.BASE_URL;
 
@@ -31,6 +42,7 @@ function App() {
           <ChakraProvider theme={theme}>
             <BrowserRouter>
               <Nav />
+
               <Routes>
                 <Route
                   path={`${base_url}:source/`}

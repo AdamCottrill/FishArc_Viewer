@@ -6,6 +6,8 @@ import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { update } from "../store/slices/DataSourceSlice";
 
+const base_url = import.meta.env.BASE_URL;
+
 export default function DataSourceRadioButtons() {
   const datasource = useAppSelector((state) => state.DataSource);
   const appDispatch = useAppDispatch();
@@ -14,7 +16,7 @@ export default function DataSourceRadioButtons() {
 
   const onChange = (value: string): void => {
     appDispatch(update(value));
-    const nextUrl = `/${value}`;
+    const nextUrl = `${base_url}${value}`;
     navigate(nextUrl);
   };
 

@@ -17,7 +17,7 @@ import { FN026 } from "./FN026";
 import { FN028 } from "./FN028";
 import { FN013 } from "./FN013";
 
-export const ProjectDetail: FC = () => {
+export default function ProjectDetail() {
   let { source, prj_cd } = useParams();
 
   const { data, error, isLoading, isFetching } = useQuery(
@@ -69,4 +69,4 @@ export const ProjectDetail: FC = () => {
       )}
     </div>
   );
-};
+}

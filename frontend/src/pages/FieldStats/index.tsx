@@ -26,7 +26,7 @@ import { Spinner } from "../../components/Spinner";
 import StatsSideBar from "./StatsSideBar";
 import ShowFieldStats from "./ShowFieldStats";
 
-export function FieldStats() {
+export default function FieldStats() {
   let [searchAsObject, setSearch] = useCustomSearchParams();
   const appDispatch = useAppDispatch();
 

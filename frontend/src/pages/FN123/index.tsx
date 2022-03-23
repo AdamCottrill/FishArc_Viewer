@@ -21,7 +21,7 @@ import { FN123Sidebar } from "./FN123Sidebar";
 
 const base_url = import.meta.env.BASE_URL;
 
-export const FN123: FC = () => {
+export default function FN123() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
   let [searchAsObject, setSearch] = useCustomSearchParams();
@@ -174,4 +174,4 @@ export const FN123: FC = () => {
       <FN123Sidebar isOpen={isOpen} onClose={onClose} />
     </Container>
   );
-};
+}

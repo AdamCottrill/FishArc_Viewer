@@ -12,6 +12,7 @@ import {
 } from "../../store/hooks";
 
 import { update, remove } from "../../store/slices/FN011ListFilterSlice";
+import { update as updateDataSource } from "../../store/slices/DataSourceSlice";
 
 import MySpinner from "../../components/MySpinner";
 import SortableTable from "../../components/SortableTable";
@@ -22,15 +23,19 @@ import { FN011Sidebar } from "./FN011Sidebar";
 
 const base_url = import.meta.env.BASE_URL;
 
-export function FN011List() {
+export default function FN011List() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
   let [searchAsObject, setSearch] = useCustomSearchParams();
 
-  let { source } = useParams();
-
   const filters = useAppSelector((state) => state.FN011List);
   const appDispatch = useAppDispatch();
+
+  const { source } = useParams();
+  const datasource = useAppSelector((state) => state.DataSource);
+  if (source !== datasource.value) {
+    appDispatch(updateDataSource(source));
+  }
 
   useEffect(() => {
     appDispatch(update(searchAsObject));
@@ -72,7 +77,7 @@ export function FN011List() {
           return (
             <Link
               as={RouterLink}
-              color="blue"
+              color="teal"
               to={{ pathname: `${base_url}${source}/project_detail/${PRJ_CD}` }}
             >
               {PRJ_CD}
@@ -97,7 +102,7 @@ export function FN011List() {
         accessor: "PRJ_DATE1",
       },
     ],
-    []
+    [source]
   );
 
   useEffect(() => {

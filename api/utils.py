@@ -6,7 +6,11 @@ from collections import OrderedDict
 import sqlite3
 
 # DB_DIR = "/home/adam/Documents/sandbox/"
-DB_DIR = "./api/db"
+
+if os.path.isdir("./api/db"):
+    DB_DIR = "./api/db"
+else:
+    DB_DIR = "./db"
 
 DB_SOURCES = {
     "fisharc": "fisharc.db",

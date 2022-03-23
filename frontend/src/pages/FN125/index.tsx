@@ -20,7 +20,7 @@ import { update, remove } from "../../store/slices/FN125ListFilterSlice";
 
 const base_url = import.meta.env.BASE_URL;
 
-export const FN125: FC = () => {
+export default function FN125() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recordCount, setRecordCount] = useState(0);
   let [searchAsObject, setSearch] = useCustomSearchParams();
@@ -208,4 +208,4 @@ export const FN125: FC = () => {
       <FN125Sidebar isOpen={isOpen} onClose={onClose} />
     </Container>
   );
-};
+}

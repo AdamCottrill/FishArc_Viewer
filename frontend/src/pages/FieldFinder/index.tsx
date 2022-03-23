@@ -32,7 +32,7 @@ interface FieldFinderFilterInterface {
   fieldname?: string;
 }
 
-export function FieldFinder() {
+export default function FieldFinder() {
   //const spinnerMessage = `Fetching Data for "${field}" from the ${table} table`;
 
   const projTypes = projectTypes.map((x) => {
