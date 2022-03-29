@@ -1,0 +1,29 @@
+* FishArc_Viewer
+
+FishArc_Viewer is a React application for FN-II projects and
+provides a high level overview of the project and the data associated
+with it. You can choose to view projects compiled from the Great Lakes
+Archives or from FishArc (the provincial Fishnet Archive). You can
+filter projects by a fairly broad range of criteria (project code,
+project name, project lead etc.), and each project detail page
+displays any available meta-data, the design tables, and links to the
+net sets, bio-counts, and biological data collected in that project
+(which can each be filtered if desired). These pages don't show all of
+the data collected in the project, but do present enough information
+to get an understanding of what the project was about.
+
+Field_Stats is a hold over from the last version of the application
+and is shows how a field has been used in the projects
+compiled from the Great Lakes Archive. Select a project type, a table,
+and then a field, and a summary presenting the projects that field was
+used in, and the top 50 distinct values is presented.
+
+Field_Finder, in many ways supersedes Field_Stats (which requires you
+to know what table a field is in). Simply type the field name (or part
+of the field name) you are interested and a list of tables by project
+type are presented that match that criteria. You can reduce your
+choices even more by selecting a project type and specifying a table
+name (or part of a table name). Clicking on one of the rows will
+present the same summary available on the field stats utility.
+
+The backend api for FishArc_Viewer is provided by a Flask application.
